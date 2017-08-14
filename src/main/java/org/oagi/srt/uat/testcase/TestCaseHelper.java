@@ -1,5 +1,6 @@
 package org.oagi.srt.uat.testcase;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -43,6 +44,14 @@ public class TestCaseHelper {
         webDriver.get(BASE_TARGET_URL + "logout");
     }
 
+    public static void sendKeys(WebElement webElement, String key) {
+        if (StringUtils.isEmpty(key)) {
+            return;
+        }
+
+        webElement.sendKeys(key);
+    }
+
     public static WebElement findElementByText(WebDriver webDriver, String cssSelector, String text) {
         List<WebElement> elements = webDriver.findElements(By.cssSelector(cssSelector));
         WebElement expectedElement = null;
@@ -57,36 +66,27 @@ public class TestCaseHelper {
         return expectedElement;
     }
 
+    public static WebElement findElementByContainingId(WebDriver webDriver, String cssSelector, String containingId) {
+        List<WebElement> inputTextElements = webDriver.findElements(By.cssSelector(cssSelector));
+        for (WebElement webElement : inputTextElements) {
+            String id = webElement.getAttribute("id");
+            if (id.contains(containingId)) {
+                return webElement;
+            }
+        }
+        return null;
+    }
+
     public static CreateAccountElements createAccountElementsOnIndexPage(WebDriver webDriver) {
         CreateAccountElements createAccountElements = new CreateAccountElements(webDriver);
 
-        List<WebElement> inputTextElements = webDriver.findElements(By.cssSelector("input[type=text]"));
-
-        for (WebElement webElement : inputTextElements) {
-            String id = webElement.getAttribute("id");
-            if (id.contains("loginId")) {
-                createAccountElements.setLoginIdElement(webElement);
-            } else if (id.contains("username")) {
-                createAccountElements.setNameElement(webElement);
-            } else if (id.contains("address")) {
-                createAccountElements.setAddressElement(webElement);
-            } else if (id.contains("mobileNo")) {
-                createAccountElements.setMobileNoElement(webElement);
-            } else if (id.contains("emial")) {
-                createAccountElements.setEmailAddressElement(webElement);
-            }
-        }
-
-        List<WebElement> inputPasswordElements = webDriver.findElements(By.cssSelector("input[type=password]"));
-
-        for (WebElement webElement : inputPasswordElements) {
-            String id = webElement.getAttribute("id");
-            if (id.contains("user_password")) {
-                createAccountElements.setPasswordElement(webElement);
-            } else if (id.contains("user_confirm_password")) {
-                createAccountElements.setConfirmPasswordElement(webElement);
-            }
-        }
+        createAccountElements.setLoginIdElement(findElementByContainingId(webDriver, "input[type=text]", "loginId"));
+        createAccountElements.setNameElement(findElementByContainingId(webDriver, "input[type=text]", "username"));
+        createAccountElements.setAddressElement(findElementByContainingId(webDriver, "input[type=text]", "address"));
+        createAccountElements.setMobileNoElement(findElementByContainingId(webDriver, "input[type=text]", "mobileNo"));
+        createAccountElements.setEmailAddressElement(findElementByContainingId(webDriver, "input[type=text]", "emial"));
+        createAccountElements.setPasswordElement(findElementByContainingId(webDriver, "input[type=password]", "user_password"));
+        createAccountElements.setConfirmPasswordElement(findElementByContainingId(webDriver, "input[type=password]", "user_confirm_password"));
 
         assertNotNull(createAccountElements.getLoginIdElement());
         assertNotNull(createAccountElements.getNameElement());
@@ -104,21 +104,11 @@ public class TestCaseHelper {
     public static CreateAccountElements createAccountElementsOnAdminPage(WebDriver webDriver) {
         CreateAccountElements createAccountElements = new CreateAccountElements(webDriver);
 
-        List<WebElement> inputTextElements = webDriver.findElements(By.cssSelector("input[type=text]"));
-        for (WebElement webElement : inputTextElements) {
-            String id = webElement.getAttribute("id");
-            if (id.contains("loginId")) {
-                createAccountElements.setLoginIdElement(webElement);
-            } else if (id.contains("username")) {
-                createAccountElements.setNameElement(webElement);
-            } else if (id.contains("address")) {
-                createAccountElements.setAddressElement(webElement);
-            } else if (id.contains("mobileNo")) {
-                createAccountElements.setMobileNoElement(webElement);
-            } else if (id.contains("email")) {
-                createAccountElements.setEmailAddressElement(webElement);
-            }
-        }
+        createAccountElements.setLoginIdElement(findElementByContainingId(webDriver, "input[type=text]", "loginId"));
+        createAccountElements.setNameElement(findElementByContainingId(webDriver, "input[type=text]", "username"));
+        createAccountElements.setAddressElement(findElementByContainingId(webDriver, "input[type=text]", "address"));
+        createAccountElements.setMobileNoElement(findElementByContainingId(webDriver, "input[type=text]", "mobileNo"));
+        createAccountElements.setEmailAddressElement(findElementByContainingId(webDriver, "input[type=text]", "email"));
 
         List<WebElement> autoCompleteElements = webDriver.findElements(By.cssSelector("tr > td > span.ui-autocomplete"));
         for (WebElement autoCompleteElement : autoCompleteElements) {
@@ -133,16 +123,8 @@ public class TestCaseHelper {
             }
         }
 
-        List<WebElement> inputPasswordElements = webDriver.findElements(By.cssSelector("input[type=password]"));
-
-        for (WebElement webElement : inputPasswordElements) {
-            String id = webElement.getAttribute("id");
-            if (id.contains("user_password")) {
-                createAccountElements.setPasswordElement(webElement);
-            } else if (id.contains("user_confirm_password")) {
-                createAccountElements.setConfirmPasswordElement(webElement);
-            }
-        }
+        createAccountElements.setPasswordElement(findElementByContainingId(webDriver, "input[type=password]", "user_password"));
+        createAccountElements.setConfirmPasswordElement(findElementByContainingId(webDriver, "input[type=password]", "user_confirm_password"));
 
         assertNotNull(createAccountElements.getLoginIdElement());
         assertNotNull(createAccountElements.getNameElement());
@@ -159,5 +141,13 @@ public class TestCaseHelper {
         assertNotNull(createAccountElements.getConfirmPasswordElement());
 
         return createAccountElements;
+    }
+
+    public static String getErrorMessage(WebDriver webDriver) {
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-error-detail")));
+        assertNotNull(errorMessageElement);
+
+        return errorMessageElement.getText();
     }
 }

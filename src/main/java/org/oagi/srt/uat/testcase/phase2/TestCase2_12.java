@@ -3,15 +3,8 @@ package org.oagi.srt.uat.testcase.phase2;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.uat.testcase.CreateAccountElements;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
-import org.oagi.srt.uat.testcase.UserRole;
-import org.oagi.srt.uat.testcase.UserType;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +13,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Random;
 
-import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createAccount;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,87 +30,41 @@ public class TestCase2_12 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithoutEmailAddress() throws InterruptedException {
-        CreateAccountInputs createAccountInputs = createAccount();
+    public void testCreateAccountWithExistingUsername() throws InterruptedException {
+        loginAsAdmin(webDriver);
+
+        CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
+        createAccountInputs.setAddress(null);
+        createAccount(webDriver, createAccountInputs);
 
         logout(webDriver);
         loginAsAdmin(webDriver);
 
-        WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
-        menu.click();
+        createAccount(webDriver, createAccountInputs);
 
-        WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", "Manage Right for All Users");
-        submenu.click();
-
-        WebElement createUserBtn = findElementByText(webDriver, "button", "Create a user");
-        createUserBtn.click();
-
-        CreateAccountElements createAccountElements = createAccountElementsOnAdminPage(webDriver);
-
-        logger.info("Re-attempting to create account using " + createAccountInputs);
-
-        createAccountElements.getLoginIdElement().sendKeys(createAccountInputs.getLoginId());
-        createAccountElements.getNameElement().sendKeys(createAccountInputs.getName());
-
-        createAccountElements.sendUserType(UserType.Free);
-        createAccountElements.sendUserRole(UserRole.Free);
-
-        createAccountElements.getMobileNoElement().clear();
-        createAccountElements.getMobileNoElement().sendKeys(createAccountInputs.getMobileNo());
-        createAccountElements.getEmailAddressElement().sendKeys(createAccountInputs.getEmailAddress());
-
-        createAccountElements.getPasswordElement().sendKeys(createAccountInputs.getPassword());
-        createAccountElements.getConfirmPasswordElement().sendKeys(createAccountInputs.getConfirmPassword());
-
-        WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
-        createAccountBtnElement.click();
-
-        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-error-detail")));
-        assertNotNull(errorMessageElement);
-
-        String errorMessage = errorMessageElement.getText();
-        assertTrue(!StringUtils.isEmpty(errorMessage));
-
+        String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);
+
+        assertTrue(!StringUtils.isEmpty(errorMessage));
     }
 
-    private CreateAccountInputs createAccount() {
+    @Test
+    public void testCreateAccountWithExistingUsernameButUpperCase() throws InterruptedException {
         loginAsAdmin(webDriver);
 
-        WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
-        menu.click();
-
-        WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", "Manage Right for All Users");
-        submenu.click();
-
-        WebElement createUserBtn = findElementByText(webDriver, "button", "Create a user");
-        createUserBtn.click();
-
-        CreateAccountElements createAccountElements = createAccountElementsOnAdminPage(webDriver);
-
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        logger.info("Attempting to create account using " + createAccountInputs);
+        createAccountInputs.setAddress(null);
+        createAccount(webDriver, createAccountInputs);
 
-        createAccountElements.getLoginIdElement().sendKeys(createAccountInputs.getLoginId());
-        createAccountElements.getNameElement().sendKeys(createAccountInputs.getName());
+        logout(webDriver);
+        loginAsAdmin(webDriver);
 
-        createAccountElements.sendUserType(UserType.Free);
-        createAccountElements.sendUserRole(UserRole.Free);
+        createAccountInputs.setLoginId(createAccountInputs.getLoginId().toUpperCase());
+        createAccount(webDriver, createAccountInputs);
 
-        createAccountElements.getAddressElement().sendKeys(createAccountInputs.getAddress());
-        createAccountElements.getMobileNoElement().clear();
-        createAccountElements.getMobileNoElement().sendKeys(createAccountInputs.getMobileNo());
+        String errorMessage = getErrorMessage(webDriver);
+        logger.info("Error Message: " + errorMessage);
 
-        createAccountInputs.setEmailAddress("hno2@nist.gov"); // to receive the verification email.
-        createAccountElements.getEmailAddressElement().sendKeys(createAccountInputs.getEmailAddress());
-
-        createAccountElements.getPasswordElement().sendKeys(createAccountInputs.getPassword());
-        createAccountElements.getConfirmPasswordElement().sendKeys(createAccountInputs.getConfirmPassword());
-
-        WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
-        createAccountBtnElement.click();
-
-        return createAccountInputs;
+        assertTrue(!StringUtils.isEmpty(errorMessage));
     }
 }

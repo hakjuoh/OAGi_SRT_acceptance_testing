@@ -2,13 +2,8 @@ package org.oagi.srt.uat.testcase.phase2;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.uat.testcase.CreateAccountElements;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
-import org.oagi.srt.uat.testcase.UserRole;
-import org.oagi.srt.uat.testcase.UserType;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Random;
 
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createAccount;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -35,38 +31,9 @@ public class TestCase2_2 {
     public void testCreateAccountWithAllInformation() throws InterruptedException {
         loginAsAdmin(webDriver);
 
-        WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
-        menu.click();
-
-        WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", "Manage Right for All Users");
-        submenu.click();
-
-        WebElement createUserBtn = findElementByText(webDriver, "button", "Create a user");
-        createUserBtn.click();
-
-        CreateAccountElements createAccountElements = createAccountElementsOnAdminPage(webDriver);
-
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        logger.info("Attempting to create account using " + createAccountInputs);
-
-        createAccountElements.getLoginIdElement().sendKeys(createAccountInputs.getLoginId());
-        createAccountElements.getNameElement().sendKeys(createAccountInputs.getName());
-
-        createAccountElements.sendUserType(UserType.Free);
-        createAccountElements.sendUserRole(UserRole.Free);
-
-        createAccountElements.getAddressElement().sendKeys(createAccountInputs.getAddress());
-        createAccountElements.getMobileNoElement().clear();
-        createAccountElements.getMobileNoElement().sendKeys(createAccountInputs.getMobileNo());
-
         createAccountInputs.setEmailAddress("hno2@nist.gov"); // to receive the verification email.
-        createAccountElements.getEmailAddressElement().sendKeys(createAccountInputs.getEmailAddress());
-
-        createAccountElements.getPasswordElement().sendKeys(createAccountInputs.getPassword());
-        createAccountElements.getConfirmPasswordElement().sendKeys(createAccountInputs.getConfirmPassword());
-
-        WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
-        createAccountBtnElement.click();
+        createAccount(webDriver, createAccountInputs);
 
         logout(webDriver);
         login(webDriver, createAccountInputs.getLoginId(), createAccountInputs.getPassword());
