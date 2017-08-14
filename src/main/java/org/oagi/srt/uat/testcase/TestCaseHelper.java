@@ -39,6 +39,10 @@ public class TestCaseHelper {
         assertEquals(username, text);
     }
 
+    public static void logout(WebDriver webDriver) {
+        webDriver.get(BASE_TARGET_URL + "logout");
+    }
+
     public static WebElement findElementByText(WebDriver webDriver, String cssSelector, String text) {
         List<WebElement> elements = webDriver.findElements(By.cssSelector(cssSelector));
         WebElement expectedElement = null;
@@ -54,7 +58,7 @@ public class TestCaseHelper {
     }
 
     public static CreateAccountElements createAccountElementsOnIndexPage(WebDriver webDriver) {
-        CreateAccountElements createAccountElements = new CreateAccountElements();
+        CreateAccountElements createAccountElements = new CreateAccountElements(webDriver);
 
         List<WebElement> inputTextElements = webDriver.findElements(By.cssSelector("input[type=text]"));
 
@@ -98,28 +102,34 @@ public class TestCaseHelper {
     }
 
     public static CreateAccountElements createAccountElementsOnAdminPage(WebDriver webDriver) {
-        CreateAccountElements createAccountElements = new CreateAccountElements();
+        CreateAccountElements createAccountElements = new CreateAccountElements(webDriver);
 
         List<WebElement> inputTextElements = webDriver.findElements(By.cssSelector("input[type=text]"));
-
         for (WebElement webElement : inputTextElements) {
             String id = webElement.getAttribute("id");
             if (id.contains("loginId")) {
                 createAccountElements.setLoginIdElement(webElement);
             } else if (id.contains("username")) {
                 createAccountElements.setNameElement(webElement);
-            } else if (id.contains("type")) {
-                createAccountElements.setUserTypeElement(webElement);
-            } else if (id.contains("role_input")) {
-                createAccountElements.setUserRoleElement(webElement);
-            } else if (id.contains("enterpriseName")) {
-                createAccountElements.setEnterpriseNameElement(webElement);
             } else if (id.contains("address")) {
                 createAccountElements.setAddressElement(webElement);
             } else if (id.contains("mobileNo")) {
                 createAccountElements.setMobileNoElement(webElement);
             } else if (id.contains("email")) {
                 createAccountElements.setEmailAddressElement(webElement);
+            }
+        }
+
+        List<WebElement> autoCompleteElements = webDriver.findElements(By.cssSelector("tr > td > span.ui-autocomplete"));
+        for (WebElement autoCompleteElement : autoCompleteElements) {
+            String id = autoCompleteElement.getAttribute("id");
+            WebElement dropdownButton = webDriver.findElement(By.cssSelector("span[id='" + id + "'] > button.ui-autocomplete-dropdown"));
+            if (id.contains("type")) {
+                createAccountElements.setUserTypeElement(autoCompleteElement, dropdownButton);
+            } else if (id.contains("role")) {
+                createAccountElements.setUserRoleElement(autoCompleteElement, dropdownButton);
+            } else if (id.contains("enterpriseName")) {
+                createAccountElements.setEnterpriseNameElement(autoCompleteElement, dropdownButton);
             }
         }
 

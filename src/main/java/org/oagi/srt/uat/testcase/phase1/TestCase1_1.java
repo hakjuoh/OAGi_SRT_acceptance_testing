@@ -28,6 +28,4 @@ public class TestCase1_1 {
         findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
     }
 
-
-
 }

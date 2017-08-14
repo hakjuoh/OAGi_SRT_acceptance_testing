@@ -1,5 +1,6 @@
 package org.oagi.srt.uat.testcase.phase2;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountElements;
@@ -9,6 +10,8 @@ import org.oagi.srt.uat.testcase.UserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +20,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Random;
 
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase2_1 {
+public class TestCase2_3 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -32,7 +37,7 @@ public class TestCase2_1 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithMinimumInformation() throws InterruptedException {
+    public void testCreateAccountWithoutEmailAddress() throws InterruptedException {
         loginAsAdmin(webDriver);
 
         WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
@@ -55,9 +60,9 @@ public class TestCase2_1 {
         createAccountElements.sendUserType(UserType.Free);
         createAccountElements.sendUserRole(UserRole.Free);
 
+        createAccountElements.getAddressElement().sendKeys(createAccountInputs.getAddress());
         createAccountElements.getMobileNoElement().clear();
         createAccountElements.getMobileNoElement().sendKeys(createAccountInputs.getMobileNo());
-        createAccountElements.getEmailAddressElement().sendKeys("hno2@nist.gov");
 
         createAccountElements.getPasswordElement().sendKeys(createAccountInputs.getPassword());
         createAccountElements.getConfirmPasswordElement().sendKeys(createAccountInputs.getConfirmPassword());
@@ -65,7 +70,13 @@ public class TestCase2_1 {
         WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
         createAccountBtnElement.click();
 
-        logout(webDriver);
-        login(webDriver, createAccountInputs.getLoginId(), createAccountInputs.getPassword());
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-error-detail")));
+        assertNotNull(errorMessageElement);
+
+        String errorMessage = errorMessageElement.getText();
+        assertTrue(!StringUtils.isEmpty(errorMessage));
+
+        logger.info("Error Message: " + errorMessage);
     }
 }
