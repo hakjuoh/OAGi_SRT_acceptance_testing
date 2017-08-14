@@ -26,7 +26,7 @@ import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase2_3 {
+public class TestCase2_11 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -37,7 +37,7 @@ public class TestCase2_3 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithInvalidEmailAddress() throws InterruptedException {
+    public void testCreateAccountWithoutEmailAddress() throws InterruptedException {
         loginAsAdmin(webDriver);
 
         WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
@@ -60,12 +60,10 @@ public class TestCase2_3 {
         createAccountElements.sendUserType(UserType.Free);
         createAccountElements.sendUserRole(UserRole.Free);
 
-        createAccountElements.getAddressElement().sendKeys(createAccountInputs.getAddress());
         createAccountElements.getMobileNoElement().clear();
         createAccountElements.getMobileNoElement().sendKeys(createAccountInputs.getMobileNo());
-
-        createAccountInputs.setEmailAddress("invalid-email-address");
-        createAccountElements.getEmailAddressElement().sendKeys(createAccountInputs.getEmailAddress());
+        // Omitting the email address intentionally
+        // createAccountElements.getEmailAddressElement().sendKeys(createAccountInputs.getEmailAddress());
 
         createAccountElements.getPasswordElement().sendKeys(createAccountInputs.getPassword());
         createAccountElements.getConfirmPasswordElement().sendKeys(createAccountInputs.getConfirmPassword());

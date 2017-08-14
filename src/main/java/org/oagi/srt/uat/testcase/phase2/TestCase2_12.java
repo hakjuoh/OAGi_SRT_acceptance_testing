@@ -26,7 +26,7 @@ import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase2_3 {
+public class TestCase2_12 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -37,7 +37,52 @@ public class TestCase2_3 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithInvalidEmailAddress() throws InterruptedException {
+    public void testCreateAccountWithoutEmailAddress() throws InterruptedException {
+        CreateAccountInputs createAccountInputs = createAccount();
+
+        logout(webDriver);
+        loginAsAdmin(webDriver);
+
+        WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
+        menu.click();
+
+        WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", "Manage Right for All Users");
+        submenu.click();
+
+        WebElement createUserBtn = findElementByText(webDriver, "button", "Create a user");
+        createUserBtn.click();
+
+        CreateAccountElements createAccountElements = createAccountElementsOnAdminPage(webDriver);
+
+        logger.info("Re-attempting to create account using " + createAccountInputs);
+
+        createAccountElements.getLoginIdElement().sendKeys(createAccountInputs.getLoginId());
+        createAccountElements.getNameElement().sendKeys(createAccountInputs.getName());
+
+        createAccountElements.sendUserType(UserType.Free);
+        createAccountElements.sendUserRole(UserRole.Free);
+
+        createAccountElements.getMobileNoElement().clear();
+        createAccountElements.getMobileNoElement().sendKeys(createAccountInputs.getMobileNo());
+        createAccountElements.getEmailAddressElement().sendKeys(createAccountInputs.getEmailAddress());
+
+        createAccountElements.getPasswordElement().sendKeys(createAccountInputs.getPassword());
+        createAccountElements.getConfirmPasswordElement().sendKeys(createAccountInputs.getConfirmPassword());
+
+        WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
+        createAccountBtnElement.click();
+
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-error-detail")));
+        assertNotNull(errorMessageElement);
+
+        String errorMessage = errorMessageElement.getText();
+        assertTrue(!StringUtils.isEmpty(errorMessage));
+
+        logger.info("Error Message: " + errorMessage);
+    }
+
+    private CreateAccountInputs createAccount() {
         loginAsAdmin(webDriver);
 
         WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
@@ -64,7 +109,7 @@ public class TestCase2_3 {
         createAccountElements.getMobileNoElement().clear();
         createAccountElements.getMobileNoElement().sendKeys(createAccountInputs.getMobileNo());
 
-        createAccountInputs.setEmailAddress("invalid-email-address");
+        createAccountInputs.setEmailAddress("hno2@nist.gov"); // to receive the verification email.
         createAccountElements.getEmailAddressElement().sendKeys(createAccountInputs.getEmailAddress());
 
         createAccountElements.getPasswordElement().sendKeys(createAccountInputs.getPassword());
@@ -73,13 +118,6 @@ public class TestCase2_3 {
         WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
         createAccountBtnElement.click();
 
-        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-error-detail")));
-        assertNotNull(errorMessageElement);
-
-        String errorMessage = errorMessageElement.getText();
-        assertTrue(!StringUtils.isEmpty(errorMessage));
-
-        logger.info("Error Message: " + errorMessage);
+        return createAccountInputs;
     }
 }

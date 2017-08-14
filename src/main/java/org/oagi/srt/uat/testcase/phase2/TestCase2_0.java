@@ -42,7 +42,7 @@ public class TestCase2_0 {
         CreateAccountElements createAccountElements = createAccountElementsOnIndexPage(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        logger.info("Create Account using " + createAccountInputs);
+        logger.info("Attempting to create account using " + createAccountInputs);
 
         createAccountElements.getLoginIdElement().sendKeys(createAccountInputs.getLoginId());
         createAccountElements.getNameElement().sendKeys(createAccountInputs.getName());

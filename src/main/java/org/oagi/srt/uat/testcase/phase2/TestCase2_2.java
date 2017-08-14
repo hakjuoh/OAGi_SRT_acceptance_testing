@@ -47,7 +47,7 @@ public class TestCase2_2 {
         CreateAccountElements createAccountElements = createAccountElementsOnAdminPage(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        logger.info("Create Account using " + createAccountInputs);
+        logger.info("Attempting to create account using " + createAccountInputs);
 
         createAccountElements.getLoginIdElement().sendKeys(createAccountInputs.getLoginId());
         createAccountElements.getNameElement().sendKeys(createAccountInputs.getName());
@@ -58,7 +58,9 @@ public class TestCase2_2 {
         createAccountElements.getAddressElement().sendKeys(createAccountInputs.getAddress());
         createAccountElements.getMobileNoElement().clear();
         createAccountElements.getMobileNoElement().sendKeys(createAccountInputs.getMobileNo());
-        createAccountElements.getEmailAddressElement().sendKeys("hno2@nist.gov");
+
+        createAccountInputs.setEmailAddress("hno2@nist.gov"); // to receive the verification email.
+        createAccountElements.getEmailAddressElement().sendKeys(createAccountInputs.getEmailAddress());
 
         createAccountElements.getPasswordElement().sendKeys(createAccountInputs.getPassword());
         createAccountElements.getConfirmPasswordElement().sendKeys(createAccountInputs.getConfirmPassword());
