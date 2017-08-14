@@ -31,7 +31,7 @@ public class TestCase2_8 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithoutName() throws InterruptedException {
+    public void testCreateAccountWithoutName() {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);

@@ -30,7 +30,7 @@ public class TestCase2_12 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithExistingUsername() throws InterruptedException {
+    public void testCreateAccountWithExistingUsername() {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
@@ -49,7 +49,7 @@ public class TestCase2_12 {
     }
 
     @Test
-    public void testCreateAccountWithExistingUsernameButUpperCase() throws InterruptedException {
+    public void testCreateAccountWithExistingUsernameButUpperCase() {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);

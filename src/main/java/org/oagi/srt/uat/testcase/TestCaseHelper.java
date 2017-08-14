@@ -52,6 +52,18 @@ public class TestCaseHelper {
         webElement.sendKeys(key);
     }
 
+    public static void gotoMenu(WebDriver webDriver, String menuName) {
+        WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", menuName);
+        menu.click();
+    }
+
+    public static void gotoSubMenu(WebDriver webDriver, String menuName, String submenuName) {
+        gotoMenu(webDriver, menuName);
+
+        WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", submenuName);
+        submenu.click();
+    }
+
     public static WebElement findElementByText(WebDriver webDriver, String cssSelector, String text) {
         List<WebElement> elements = webDriver.findElements(By.cssSelector(cssSelector));
         WebElement expectedElement = null;

@@ -31,7 +31,7 @@ public class TestCase2_3 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithInvalidEmailAddress() throws InterruptedException {
+    public void testCreateAccountWithInvalidEmailAddress() {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);

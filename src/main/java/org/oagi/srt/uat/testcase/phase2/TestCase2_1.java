@@ -24,7 +24,7 @@ public class TestCase2_1 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithMinimumInformation() throws InterruptedException {
+    public void testCreateAccountWithMinimumInformation() {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);

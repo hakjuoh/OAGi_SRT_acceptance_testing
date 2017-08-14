@@ -2,7 +2,6 @@ package org.oagi.srt.uat.testcase.phase2;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oagi.srt.uat.testcase.CreateAccountInputs;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +11,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Random;
 
-import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
-import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createAccount;
+import static org.oagi.srt.uat.testcase.TestCaseHelper.findElementByContainingId;
+import static org.oagi.srt.uat.testcase.TestCaseHelper.gotoSubMenu;
+import static org.oagi.srt.uat.testcase.TestCaseHelper.loginAsAdmin;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase2_2 {
+public class TestCase2_13 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -28,14 +28,10 @@ public class TestCase2_2 {
     private Random random;
 
     @Test
-    public void testCreateAccountWithAllInformation() {
+    public void testAssigningDeveloperUserRole() {
         loginAsAdmin(webDriver);
+        gotoSubMenu(webDriver, "Admin", "Manage Right for All Users");
 
-        CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        createAccountInputs.setEmailAddress("hno2@nist.gov"); // to receive the verification email.
-        createAccount(webDriver, createAccountInputs);
-
-        logout(webDriver);
-        login(webDriver, createAccountInputs.getLoginId(), createAccountInputs.getPassword());
+        findElementByContainingId(webDriver, "input[type=text]", "loginId_input");
     }
 }

@@ -33,7 +33,7 @@ public class TestCase2_0 {
     private Random random;
 
     @Test
-    public void testCreateAccount() throws InterruptedException {
+    public void testCreateAccount() {
         webDriver.get(BASE_TARGET_URL);
 
         WebElement createAccountLinkElement = webDriver.findElement(By.cssSelector("div.create-account-callout a"));

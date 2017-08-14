@@ -17,11 +17,7 @@ public class TestCase2_Helper {
     private static Logger logger = LoggerFactory.getLogger(TestCase2_Helper.class);
 
     public static void createAccount(WebDriver webDriver, CreateAccountInputs createAccountInputs) {
-        WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", "Admin");
-        menu.click();
-
-        WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", "Manage Right for All Users");
-        submenu.click();
+        gotoSubMenu(webDriver, "Admin", "Manage Right for All Users");
 
         WebElement createUserBtn = findElementByText(webDriver, "button", "Create a user");
         createUserBtn.click();
