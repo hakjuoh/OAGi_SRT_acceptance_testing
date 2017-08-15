@@ -2,6 +2,7 @@ package org.oagi.srt.uat.testcase;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -16,12 +17,16 @@ public class TestCaseHelper {
 
     private static final String BASE_TARGET_URL = "http://uatsftp.justransform.com/";
 
+    public static void index(WebDriver webDriver) {
+        webDriver.get(BASE_TARGET_URL);
+    }
+
     public static void loginAsAdmin(WebDriver webDriver) {
         login(webDriver, "oagis", "oagis");
     }
 
     public static void login(WebDriver webDriver, String username, String password) {
-        webDriver.get(BASE_TARGET_URL);
+        index(webDriver);
 
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
         WebElement signinBtnElement = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("input[type=submit].btn-block")));
@@ -65,7 +70,8 @@ public class TestCaseHelper {
     }
 
     public static WebElement findElementByText(WebDriver webDriver, String cssSelector, String text) {
-        List<WebElement> elements = webDriver.findElements(By.cssSelector(cssSelector));
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
         WebElement expectedElement = null;
         for (WebElement element : elements) {
             if (text.equals(element.getText())) {
@@ -79,14 +85,53 @@ public class TestCaseHelper {
     }
 
     public static WebElement findElementByContainingId(WebDriver webDriver, String cssSelector, String containingId) {
-        List<WebElement> inputTextElements = webDriver.findElements(By.cssSelector(cssSelector));
-        for (WebElement webElement : inputTextElements) {
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
+        for (WebElement webElement : elements) {
             String id = webElement.getAttribute("id");
             if (id.contains(containingId)) {
                 return webElement;
             }
         }
         return null;
+    }
+
+    public static List<WebElement> findDropdownElements(WebDriver webDriver, String containsId) {
+        List<WebElement> autocompletePanels = webDriver.findElements(By.cssSelector("div.ui-autocomplete-panel"));
+        for (WebElement autocompletePanel : autocompletePanels) {
+            String id = autocompletePanel.getAttribute("id");
+            if (id.contains(containsId)) {
+                return webDriver.findElements(By.cssSelector("div[id='" + id + "'] > ul.ui-autocomplete-items > li"));
+            }
+        }
+        throw new IllegalStateException();
+    }
+
+    public static void clickDropdownElement(WebDriver webDriver, WebElement element, String targetLabel) {
+        WebElement dropdownButton = webDriver.findElement(By.cssSelector("span[id='" + element.getAttribute("id") + "'] > button.ui-autocomplete-dropdown"));
+        dropdownButton.click();
+
+        String elementId = element.getAttribute("id");
+        String containsId = elementId.substring(elementId.indexOf(':') + 1, elementId.length());
+
+        while (StringUtils.isEmpty(getInputTextElement(webDriver, elementId).getAttribute("value"))) {
+            List<WebElement> dropdownElements = findDropdownElements(webDriver, containsId);
+            for (WebElement dropdownElement : dropdownElements) {
+                String itemLabel = dropdownElement.getAttribute("data-item-label");
+                if (targetLabel.equals(itemLabel)) {
+                    while (StringUtils.isEmpty(getInputTextElement(webDriver, elementId).getAttribute("value"))) {
+                        try {
+                            dropdownElement.click();
+                        } catch (ElementNotVisibleException ignore) {
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static WebElement getInputTextElement(WebDriver webDriver, String id) {
+        return webDriver.findElement(By.cssSelector("span[id='" + id + "'] > input[type='text']"));
     }
 
     public static CreateAccountElements createAccountElementsOnIndexPage(WebDriver webDriver) {
@@ -122,18 +167,9 @@ public class TestCaseHelper {
         createAccountElements.setMobileNoElement(findElementByContainingId(webDriver, "input[type=text]", "mobileNo"));
         createAccountElements.setEmailAddressElement(findElementByContainingId(webDriver, "input[type=text]", "email"));
 
-        List<WebElement> autoCompleteElements = webDriver.findElements(By.cssSelector("tr > td > span.ui-autocomplete"));
-        for (WebElement autoCompleteElement : autoCompleteElements) {
-            String id = autoCompleteElement.getAttribute("id");
-            WebElement dropdownButton = webDriver.findElement(By.cssSelector("span[id='" + id + "'] > button.ui-autocomplete-dropdown"));
-            if (id.contains("type")) {
-                createAccountElements.setUserTypeElement(autoCompleteElement, dropdownButton);
-            } else if (id.contains("role")) {
-                createAccountElements.setUserRoleElement(autoCompleteElement, dropdownButton);
-            } else if (id.contains("enterpriseName")) {
-                createAccountElements.setEnterpriseNameElement(autoCompleteElement, dropdownButton);
-            }
-        }
+        createAccountElements.setUserTypeElement(findElementByContainingId(webDriver, "span.ui-autocomplete", "type"));
+        createAccountElements.setUserRoleElement(findElementByContainingId(webDriver, "span.ui-autocomplete", "role"));
+        createAccountElements.setEnterpriseNameElement(findElementByContainingId(webDriver, "span.ui-autocomplete", "enterpriseName"));
 
         createAccountElements.setPasswordElement(findElementByContainingId(webDriver, "input[type=password]", "user_password"));
         createAccountElements.setConfirmPasswordElement(findElementByContainingId(webDriver, "input[type=password]", "user_confirm_password"));
