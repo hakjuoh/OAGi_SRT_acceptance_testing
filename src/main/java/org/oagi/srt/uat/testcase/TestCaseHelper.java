@@ -1,11 +1,9 @@
 package org.oagi.srt.uat.testcase;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotVisibleException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
@@ -63,15 +61,35 @@ public class TestCaseHelper {
     }
 
     public static void gotoMenu(WebDriver webDriver, String menuName) {
-        WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", menuName);
-        menu.click();
+        index(webDriver);
+
+        long s = System.currentTimeMillis();
+        while (!isTimeout(s, 2L, TimeUnit.SECONDS)) {
+            try {
+                WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", menuName);
+                menu.click();
+                break;
+            } catch (StaleElementReferenceException ignore) {
+            }
+        }
+
+        throw new IllegalArgumentException("Can't find given menu: " + menuName);
     }
 
     public static void gotoSubMenu(WebDriver webDriver, String menuName, String submenuName) {
         gotoMenu(webDriver, menuName);
 
-        WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", submenuName);
-        submenu.click();
+        long s = System.currentTimeMillis();
+        while (!isTimeout(s, 2L, TimeUnit.SECONDS)) {
+            try {
+                WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", submenuName);
+                submenu.click();
+                break;
+            } catch (StaleElementReferenceException ignore) {
+            }
+        }
+
+        throw new IllegalArgumentException("Can't find given submenu: " + submenuName);
     }
 
     public static WebElement findElementByText(WebDriver webDriver, String cssSelector, String text) {
@@ -228,6 +246,30 @@ public class TestCaseHelper {
         assertNotNull(createAccountElements.getConfirmPasswordElement());
 
         return createAccountElements;
+    }
+
+    public static CreateEnterpriseElements createEnterpriseElements(WebDriver webDriver) {
+        CreateEnterpriseElements enterpriseElements = new CreateEnterpriseElements(webDriver);
+
+        enterpriseElements.setEnterpriseNameElement(findElementByContainingId(webDriver, "input[type=text]", "enterpriseName"));
+        enterpriseElements.setFirstNameElement(findElementByContainingId(webDriver, "input[type=text]", "firstName"));
+        enterpriseElements.setLastNameElement(findElementByContainingId(webDriver, "input[type=text]", "lastName"));
+        enterpriseElements.setPhoneElement(findElementByContainingId(webDriver, "input[type=text]", "phone"));
+        enterpriseElements.setAddressElement(findElementByContainingId(webDriver, "input[type=text]", "address"));
+        enterpriseElements.setEmailElement(findElementByContainingId(webDriver, "input[type=text]", "email"));
+        enterpriseElements.setPurgeDurationInMonthsElement(new Select(findElementByContainingId(webDriver, "select", "purgeDuration")));
+        enterpriseElements.setSignedAgreementElement(findElementByContainingId(webDriver, "div.ui-chkbox", "agreement"));
+
+        assertNotNull(enterpriseElements.getEnterpriseNameElement());
+        assertNotNull(enterpriseElements.getFirstNameElement());
+        assertNotNull(enterpriseElements.getLastNameElement());
+        assertNotNull(enterpriseElements.getPhoneElement());
+        assertNotNull(enterpriseElements.getAddressElement());
+        assertNotNull(enterpriseElements.getEmailElement());
+        assertNotNull(enterpriseElements.getPurgeDurationInMonthsElement());
+        assertNotNull(enterpriseElements.getSignedAgreementElement());
+
+        return enterpriseElements;
     }
 
     public static String getErrorMessage(WebDriver webDriver) {

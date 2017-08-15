@@ -83,6 +83,10 @@ public class CreateAccountElements {
         this.enterpriseNameElement = enterpriseNameElement;
     }
 
+    public void sendEnterpriseName(String enterpriseName) {
+        clickDropdownElement(webDriver, enterpriseNameElement, enterpriseName);
+    }
+
     public WebElement getAddressElement() {
         return addressElement;
     }

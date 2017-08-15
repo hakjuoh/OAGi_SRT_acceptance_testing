@@ -55,11 +55,11 @@ public class TestCase2_13 {
         return createAccount(webDriver, random, UserType.Root, UserRole.Root);
     }
 
-    static CreateAccountInputs createDeveloper(WebDriver webDriver, Random random) {
+    public static CreateAccountInputs createDeveloper(WebDriver webDriver, Random random) {
         return createAccount(webDriver, random, UserType.OAGI, UserRole.Developer);
     }
 
-    static CreateAccountInputs createAdminDeveloper(WebDriver webDriver, Random random) {
+    public static CreateAccountInputs createAdminDeveloper(WebDriver webDriver, Random random) {
         return createAccount(webDriver, random, UserType.OAGI, UserRole.AdminDeveloper);
     }
 
@@ -89,12 +89,11 @@ public class TestCase2_13 {
         return createAccountInputs;
     }
 
-    static void gotoManagePage(WebDriver webDriver, CreateAccountInputs createAccountInputs) {
+    public static void gotoManagePage(WebDriver webDriver, CreateAccountInputs createAccountInputs) {
         gotoManagePage(webDriver, createAccountInputs.getLoginId());
     }
 
     static void gotoManagePage(WebDriver webDriver, String loginId) {
-        index(webDriver);
         gotoSubMenu(webDriver, "Admin", "Manage Right for All Users");
 
         WebElement searchInputText = findElementByContainingId(webDriver, "input[type=text]", "loginId_input");
