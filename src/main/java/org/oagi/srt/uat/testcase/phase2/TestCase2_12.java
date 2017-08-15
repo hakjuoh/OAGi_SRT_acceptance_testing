@@ -1,6 +1,7 @@
 package org.oagi.srt.uat.testcase.phase2;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
@@ -15,7 +16,6 @@ import java.util.Random;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
-import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createAccount;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -29,18 +29,23 @@ public class TestCase2_12 {
     @Autowired
     private Random random;
 
+    @After
+    public void tearDown() {
+        webDriver.close();
+    }
+
     @Test
     public void testCreateAccountWithExistingUsername() {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
         createAccountInputs.setAddress(null);
-        createAccount(webDriver, createAccountInputs);
+        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
 
         logout(webDriver);
         loginAsAdmin(webDriver);
 
-        createAccount(webDriver, createAccountInputs);
+        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
 
         String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);
@@ -54,13 +59,13 @@ public class TestCase2_12 {
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
         createAccountInputs.setAddress(null);
-        createAccount(webDriver, createAccountInputs);
+        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
 
         logout(webDriver);
         loginAsAdmin(webDriver);
 
         createAccountInputs.setLoginId(createAccountInputs.getLoginId().toUpperCase());
-        createAccount(webDriver, createAccountInputs);
+        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
 
         String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);

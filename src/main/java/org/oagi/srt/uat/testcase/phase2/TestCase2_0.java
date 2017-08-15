@@ -1,5 +1,6 @@
 package org.oagi.srt.uat.testcase.phase2;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountElements;
@@ -31,6 +32,11 @@ public class TestCase2_0 {
 
     @Autowired
     private Random random;
+
+    @After
+    public void tearDown() {
+        webDriver.close();
+    }
 
     @Test
     public void testCreateAccount() {

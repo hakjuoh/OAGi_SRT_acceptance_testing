@@ -1,5 +1,6 @@
 package org.oagi.srt.uat.testcase.phase1;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -20,6 +21,11 @@ public class TestCase1_1 {
 
     @Autowired
     private WebDriver webDriver;
+
+    @After
+    public void tearDown() {
+        webDriver.close();
+    }
 
     @Test
     public void testLoginUsingAdmin() {

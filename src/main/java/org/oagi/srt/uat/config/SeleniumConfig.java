@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -28,6 +29,7 @@ public class SeleniumConfig {
     private ResourceLoader resourceLoader;
 
     @Bean
+    @Scope("prototype")
     public WebDriver webDriver() throws IOException {
         if (StringUtils.isEmpty(osName)) {
             throw new IllegalStateException("Can't read 'os.name' system property.");

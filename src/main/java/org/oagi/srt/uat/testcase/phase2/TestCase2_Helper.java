@@ -16,7 +16,11 @@ public class TestCase2_Helper {
 
     private static Logger logger = LoggerFactory.getLogger(TestCase2_Helper.class);
 
-    public static void createAccount(WebDriver webDriver, CreateAccountInputs createAccountInputs) {
+    public static void createFreeAccount(WebDriver webDriver, CreateAccountInputs createAccountInputs) {
+        createAccount(webDriver, createAccountInputs, UserType.Free, UserRole.Free);
+    }
+
+    public static void createAccount(WebDriver webDriver, CreateAccountInputs createAccountInputs, UserType userType, UserRole userRole) {
         gotoSubMenu(webDriver, "Admin", "Manage Right for All Users");
 
         WebElement createUserBtn = findElementByText(webDriver, "button", "Create a user");
@@ -28,8 +32,8 @@ public class TestCase2_Helper {
         sendKeys(createAccountElements.getLoginIdElement(), createAccountInputs.getLoginId());
         sendKeys(createAccountElements.getNameElement(), createAccountInputs.getName());
 
-        createAccountElements.sendUserType(UserType.Free);
-        createAccountElements.sendUserRole(UserRole.Free);
+        createAccountElements.sendUserType(userType);
+        createAccountElements.sendUserRole(userRole);
 
         sendKeys(createAccountElements.getAddressElement(), createAccountInputs.getAddress());
         createAccountElements.getMobileNoElement().clear();

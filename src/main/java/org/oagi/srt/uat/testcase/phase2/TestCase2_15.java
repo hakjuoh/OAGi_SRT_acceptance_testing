@@ -1,10 +1,11 @@
 package org.oagi.srt.uat.testcase.phase2;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
+import org.oagi.srt.uat.testcase.UserRole;
+import org.oagi.srt.uat.testcase.UserType;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +15,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Random;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.oagi.srt.uat.testcase.TestCaseHelper.getErrorMessage;
+import static junit.framework.TestCase.assertNotNull;
+import static org.oagi.srt.uat.testcase.TestCaseHelper.findElementByText;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.loginAsAdmin;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.createAdminDeveloper;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.gotoManagePage;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase2_6 {
+public class TestCase2_15 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -36,17 +39,13 @@ public class TestCase2_6 {
     }
 
     @Test
-    public void testCreateAccountWithoutPassword() {
+    public void testAssigningAdminDeveloperUserRole() {
+        CreateAccountInputs adminDeveloper = createAdminDeveloper(webDriver, random);
+
         loginAsAdmin(webDriver);
+        gotoManagePage(webDriver, adminDeveloper);
 
-        CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        createAccountInputs.setPassword(null);
-        createAccountInputs.setConfirmPassword(null);
-        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
-
-        String errorMessage = getErrorMessage(webDriver);
-        logger.info("Error Message: " + errorMessage);
-
-        assertTrue(!StringUtils.isEmpty(errorMessage));
+        assertNotNull(findElementByText(webDriver, "td", UserType.OAGI.toString()));
+        assertNotNull(findElementByText(webDriver, "td", UserRole.AdminDeveloper.toString()));
     }
 }

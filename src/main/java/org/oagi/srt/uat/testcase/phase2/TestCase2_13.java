@@ -1,5 +1,6 @@
 package org.oagi.srt.uat.testcase.phase2;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
@@ -22,7 +23,6 @@ import java.util.Random;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
-import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createAccount;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -36,30 +36,70 @@ public class TestCase2_13 {
     @Autowired
     private Random random;
 
+    @After
+    public void tearDown() {
+        webDriver.close();
+    }
+
     @Test
     public void testAssigningDeveloperUserRole() {
+        CreateAccountInputs createAccountInputs = createAdminDeveloper(webDriver, random);
+        login(webDriver, createAccountInputs);
+        gotoManagePage(webDriver, createAccountInputs);
+
+        assertNotNull(findElementByText(webDriver, "td", UserType.OAGI.toString()));
+        assertNotNull(findElementByText(webDriver, "td", UserRole.Developer.toString()));
+    }
+
+    static CreateAccountInputs createRoot(WebDriver webDriver, Random random) {
+        return createAccount(webDriver, random, UserType.Root, UserRole.Root);
+    }
+
+    static CreateAccountInputs createDeveloper(WebDriver webDriver, Random random) {
+        return createAccount(webDriver, random, UserType.OAGI, UserRole.Developer);
+    }
+
+    static CreateAccountInputs createAdminDeveloper(WebDriver webDriver, Random random) {
+        return createAccount(webDriver, random, UserType.OAGI, UserRole.AdminDeveloper);
+    }
+
+    static CreateAccountInputs createAccount(WebDriver webDriver, Random random, UserType userType, UserRole userRole) {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
         createAccountInputs.setAddress(null);
-        createAccount(webDriver, createAccountInputs);
+        TestCase2_Helper.createAccount(webDriver, createAccountInputs, userType, userRole);
+        logout(webDriver);
 
-        gotoManagePage(createAccountInputs);
-        addRole(UserType.OAGI, UserRole.Developer);
-
-        gotoManagePage(createAccountInputs);
-
-        assertNotNull(findElementByText(webDriver, "td", "OAGI Tenant"));
-        assertNotNull(findElementByText(webDriver, "td", "Developer"));
+        return createAccountInputs;
     }
 
-    private void gotoManagePage(CreateAccountInputs createAccountInputs) {
+    static CreateAccountInputs createAccountAndAddRole(WebDriver webDriver, Random random, UserType userType, UserRole userRole) {
+        loginAsAdmin(webDriver);
+
+        CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
+        createAccountInputs.setAddress(null);
+        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
+
+        gotoManagePage(webDriver, createAccountInputs);
+        addRole(webDriver, userType, userRole);
+        revokeRole(webDriver, UserType.Free, UserRole.Free);
+        logout(webDriver);
+
+        return createAccountInputs;
+    }
+
+    static void gotoManagePage(WebDriver webDriver, CreateAccountInputs createAccountInputs) {
+        gotoManagePage(webDriver, createAccountInputs.getLoginId());
+    }
+
+    static void gotoManagePage(WebDriver webDriver, String loginId) {
         index(webDriver);
         gotoSubMenu(webDriver, "Admin", "Manage Right for All Users");
 
         WebElement searchInputText = findElementByContainingId(webDriver, "input[type=text]", "loginId_input");
-        searchInputText.sendKeys(createAccountInputs.getLoginId());
-        findElementByText(webDriver, "span.ui-autocomplete-query", createAccountInputs.getLoginId()).click();
+        searchInputText.sendKeys(loginId);
+        findElementByText(webDriver, "span.ui-autocomplete-query", loginId).click();
 
         WebElement searchButton = findElementByText(webDriver, "button[type=submit]", "Search");
         searchButton.click();
@@ -73,7 +113,7 @@ public class TestCase2_13 {
         manageLink.click();
     }
 
-    private void addRole(UserType userType, UserRole userRole) {
+    static void addRole(WebDriver webDriver, UserType userType, UserRole userRole) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
         WebElement addRoleButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type=submit]")));
         addRoleButton.click();
@@ -88,5 +128,28 @@ public class TestCase2_13 {
 
         WebElement assignRoleButton = findElementByText(webDriver, "button[type=submit]", "Assign a role");
         assignRoleButton.click();
+    }
+
+    static void revokeRole(WebDriver webDriver, UserType userType, UserRole userRole) {
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        List<WebElement> tableRows = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("tr.ui-widget-content")));
+        for (WebElement tableRow : tableRows) {
+            String dataRi = tableRow.getAttribute("data-ri");
+            List<WebElement> tableDatas = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("tr[data-ri='" + dataRi + "'] > td")));
+            boolean isUserType = false, isUserRole = false;
+            for (WebElement tableData : tableDatas) {
+                if (userType.toString().equals(tableData.getText())) {
+                    isUserType = true;
+                } else if (userRole.toString().equals(tableData.getText())) {
+                    isUserRole = true;
+                }
+            }
+
+            if (isUserType && isUserRole) {
+                WebElement revokeButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tr[data-ri='" + dataRi + "'] > td > input[type='submit']")));
+                revokeButton.click();
+                break;
+            }
+        }
     }
 }

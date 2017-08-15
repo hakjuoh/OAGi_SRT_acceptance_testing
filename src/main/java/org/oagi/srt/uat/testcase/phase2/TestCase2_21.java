@@ -5,6 +5,8 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
+import org.oagi.srt.uat.testcase.UserRole;
+import org.oagi.srt.uat.testcase.UserType;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +19,11 @@ import java.util.Random;
 import static junit.framework.TestCase.assertTrue;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.getErrorMessage;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.loginAsAdmin;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase2_6 {
+public class TestCase2_21 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -35,14 +38,22 @@ public class TestCase2_6 {
         webDriver.close();
     }
 
-    @Test
-    public void testCreateAccountWithoutPassword() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testAdminCannotAssignRootRole() {
+        CreateAccountInputs admin = createAdminDeveloper(webDriver, random);
         loginAsAdmin(webDriver);
 
-        CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        createAccountInputs.setPassword(null);
-        createAccountInputs.setConfirmPassword(null);
-        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
+        gotoManagePage(webDriver, admin);
+        addRole(webDriver, UserType.Root, UserRole.Root);
+    }
+
+    @Test
+    public void testAdminCannotRevokeRootRole() {
+        CreateAccountInputs root = createRoot(webDriver, random);
+        loginAsAdmin(webDriver);
+
+        gotoManagePage(webDriver, root);
+        revokeRole(webDriver, UserType.Root, UserRole.Root);
 
         String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);

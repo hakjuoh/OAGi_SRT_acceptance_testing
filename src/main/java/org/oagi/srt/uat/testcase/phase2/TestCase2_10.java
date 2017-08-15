@@ -1,6 +1,7 @@
 package org.oagi.srt.uat.testcase.phase2;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
@@ -16,7 +17,6 @@ import java.util.Random;
 import static junit.framework.TestCase.assertTrue;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.getErrorMessage;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.loginAsAdmin;
-import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createAccount;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -30,13 +30,18 @@ public class TestCase2_10 {
     @Autowired
     private Random random;
 
+    @After
+    public void tearDown() {
+        webDriver.close();
+    }
+
     @Test
     public void testCreateAccountWithoutMobileNo() {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
         createAccountInputs.setMobileNo(null);
-        createAccount(webDriver, createAccountInputs);
+        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
 
         String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);

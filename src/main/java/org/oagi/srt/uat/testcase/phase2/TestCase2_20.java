@@ -5,6 +5,8 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
+import org.oagi.srt.uat.testcase.UserRole;
+import org.oagi.srt.uat.testcase.UserType;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +18,13 @@ import java.util.Random;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.getErrorMessage;
+import static org.oagi.srt.uat.testcase.TestCaseHelper.login;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.loginAsAdmin;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase2_6 {
+public class TestCase2_20 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -36,13 +40,26 @@ public class TestCase2_6 {
     }
 
     @Test
-    public void testCreateAccountWithoutPassword() {
+    public void testAdminCannotHaveDeveloperRole() {
+        CreateAccountInputs admin = createAdminDeveloper(webDriver, random);
         loginAsAdmin(webDriver);
 
-        CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        createAccountInputs.setPassword(null);
-        createAccountInputs.setConfirmPassword(null);
-        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
+        gotoManagePage(webDriver, admin);
+        addRole(webDriver, UserType.OAGI, UserRole.Developer);
+
+        String errorMessage = getErrorMessage(webDriver);
+        logger.info("Error Message: " + errorMessage);
+
+        assertTrue(!StringUtils.isEmpty(errorMessage));
+    }
+
+    @Test
+    public void testDeveloperCannotHaveAdminRole() {
+        CreateAccountInputs developer = createDeveloper(webDriver, random);
+        loginAsAdmin(webDriver);
+
+        gotoManagePage(webDriver, developer);
+        addRole(webDriver, UserType.OAGI, UserRole.AdminDeveloper);
 
         String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);

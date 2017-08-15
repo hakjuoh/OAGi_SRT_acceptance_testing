@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -23,6 +24,10 @@ public class TestCaseHelper {
 
     public static void loginAsAdmin(WebDriver webDriver) {
         login(webDriver, "oagis", "oagis");
+    }
+
+    public static void login(WebDriver webDriver, CreateAccountInputs createAccountInputs) {
+        login(webDriver, createAccountInputs.getLoginId(), createAccountInputs.getPassword());
     }
 
     public static void login(WebDriver webDriver, String username, String password) {
@@ -70,6 +75,10 @@ public class TestCaseHelper {
     }
 
     public static WebElement findElementByText(WebDriver webDriver, String cssSelector, String text) {
+        return findElementByText(webDriver, cssSelector, text, false);
+    }
+
+    public static WebElement findElementByText(WebDriver webDriver, String cssSelector, String text, boolean nullReturn) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
         List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
         WebElement expectedElement = null;
@@ -80,28 +89,41 @@ public class TestCaseHelper {
             }
         }
 
-        assertNotNull(expectedElement);
+        if (!nullReturn) {
+            assertNotNull(expectedElement);
+        }
         return expectedElement;
     }
 
     public static WebElement findElementByContainingId(WebDriver webDriver, String cssSelector, String containingId) {
+        return findElementByContainingId(webDriver, cssSelector, containingId, false);
+    }
+
+    public static WebElement findElementByContainingId(WebDriver webDriver, String cssSelector, String containingId, boolean nullReturn) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
         List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
+        WebElement expectedElement = null;
         for (WebElement webElement : elements) {
             String id = webElement.getAttribute("id");
             if (id.contains(containingId)) {
-                return webElement;
+                expectedElement = webElement;
+                break;
             }
         }
-        return null;
+
+        if (!nullReturn) {
+            assertNotNull(expectedElement);
+        }
+        return expectedElement;
     }
 
     public static List<WebElement> findDropdownElements(WebDriver webDriver, String containsId) {
-        List<WebElement> autocompletePanels = webDriver.findElements(By.cssSelector("div.ui-autocomplete-panel"));
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        List<WebElement> autocompletePanels = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div.ui-autocomplete-panel")));
         for (WebElement autocompletePanel : autocompletePanels) {
             String id = autocompletePanel.getAttribute("id");
             if (id.contains(containsId)) {
-                return webDriver.findElements(By.cssSelector("div[id='" + id + "'] > ul.ui-autocomplete-items > li"));
+                return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div[id='" + id + "'] > ul.ui-autocomplete-items > li")));
             }
         }
         throw new IllegalStateException();
@@ -114,20 +136,37 @@ public class TestCaseHelper {
         String elementId = element.getAttribute("id");
         String containsId = elementId.substring(elementId.indexOf(':') + 1, elementId.length());
 
-        while (StringUtils.isEmpty(getInputTextElement(webDriver, elementId).getAttribute("value"))) {
+        long s = System.currentTimeMillis();
+        while (!isTimeout(s, 2L, TimeUnit.SECONDS) || !isValueFilled(webDriver, elementId)) {
             List<WebElement> dropdownElements = findDropdownElements(webDriver, containsId);
+            boolean clicked = false;
             for (WebElement dropdownElement : dropdownElements) {
                 String itemLabel = dropdownElement.getAttribute("data-item-label");
                 if (targetLabel.equals(itemLabel)) {
-                    while (StringUtils.isEmpty(getInputTextElement(webDriver, elementId).getAttribute("value"))) {
-                        try {
-                            dropdownElement.click();
-                        } catch (ElementNotVisibleException ignore) {
-                        }
+                    try {
+                        dropdownElement.click();
+                        clicked = true;
+                    } catch (ElementNotVisibleException ignore) {
                     }
                 }
             }
+            if (!clicked) {
+                throw new IllegalArgumentException("Can't find given label: " + targetLabel);
+            }
         }
+
+        if (isValueFilled(webDriver, elementId)) {
+            return;
+        }
+        throw new IllegalStateException();
+    }
+
+    private static boolean isValueFilled(WebDriver webDriver, String elementId) {
+        return !StringUtils.isEmpty(getInputTextElement(webDriver, elementId).getAttribute("value"));
+    }
+
+    private static boolean isTimeout(long startTime, long timeout, TimeUnit timeUnit) {
+        return (System.currentTimeMillis() - startTime) > timeUnit.convert(timeout, TimeUnit.MILLISECONDS);
     }
 
     public static WebElement getInputTextElement(WebDriver webDriver, String id) {
