@@ -43,7 +43,7 @@ public class TestCase2_13 {
 
     @Test
     public void testAssigningDeveloperUserRole() {
-        CreateAccountInputs createAccountInputs = createAdminDeveloper(webDriver, random);
+        CreateAccountInputs createAccountInputs = createFreeAccountAndAddRole(webDriver, random, UserType.OAGI, UserRole.Developer);
         login(webDriver, createAccountInputs);
         gotoManagePage(webDriver, createAccountInputs);
 
@@ -74,7 +74,7 @@ public class TestCase2_13 {
         return createAccountInputs;
     }
 
-    static CreateAccountInputs createAccountAndAddRole(WebDriver webDriver, Random random, UserType userType, UserRole userRole) {
+    static CreateAccountInputs createFreeAccountAndAddRole(WebDriver webDriver, Random random, UserType userType, UserRole userRole) {
         loginAsAdmin(webDriver);
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);

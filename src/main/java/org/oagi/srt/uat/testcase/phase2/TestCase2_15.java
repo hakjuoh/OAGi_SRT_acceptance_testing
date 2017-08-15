@@ -18,7 +18,7 @@ import java.util.Random;
 import static junit.framework.TestCase.assertNotNull;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.findElementByText;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.loginAsAdmin;
-import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.createAdminDeveloper;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.createFreeAccountAndAddRole;
 import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.gotoManagePage;
 
 @RunWith(SpringRunner.class)
@@ -40,7 +40,7 @@ public class TestCase2_15 {
 
     @Test
     public void testAssigningAdminDeveloperUserRole() {
-        CreateAccountInputs adminDeveloper = createAdminDeveloper(webDriver, random);
+        CreateAccountInputs adminDeveloper = createFreeAccountAndAddRole(webDriver, random, UserType.OAGI, UserRole.AdminDeveloper);
 
         loginAsAdmin(webDriver);
         gotoManagePage(webDriver, adminDeveloper);
