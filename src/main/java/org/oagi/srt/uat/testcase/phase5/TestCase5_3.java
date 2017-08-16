@@ -1,10 +1,13 @@
-package org.oagi.srt.uat.testcase.phase2;
+package org.oagi.srt.uat.testcase.phase5;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
+import org.oagi.srt.uat.testcase.CreateEnterpriseInputs;
+import org.oagi.srt.uat.testcase.UserRole;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +18,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.oagi.srt.uat.testcase.TestCaseHelper.getErrorMessage;
-import static org.oagi.srt.uat.testcase.TestCaseHelper.loginAsAdmin;
+import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createEnterpriseAccount;
+import static org.oagi.srt.uat.testcase.phase3.TestCase3_Helper.createEnterprise;
+import static org.oagi.srt.uat.testcase.phase5.TestCase5_Helper.createAccountByEnterpriseAdmin;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase2_3 {
+public class TestCase5_3 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -30,18 +35,30 @@ public class TestCase2_3 {
     @Autowired
     private Random random;
 
+    private CreateEnterpriseInputs enterprise;
+    private CreateAccountInputs enterpriseAdmin;
+
+    @Before
+    public void setUp() {
+        enterprise = createEnterprise(webDriver, random, CreateAccountInputs.OAGI_ADMIN);
+
+        enterpriseAdmin = CreateAccountInputs.generateRandomly(random);
+        createEnterpriseAccount(webDriver, enterpriseAdmin, enterprise, UserRole.AdminUser);
+
+        logout(webDriver);
+        login(webDriver, enterpriseAdmin);
+    }
+
     @After
     public void tearDown() {
         webDriver.close();
     }
-
+    
     @Test
-    public void testCreateAccountWithInvalidEmailAddress() {
-        loginAsAdmin(webDriver);
-
+    public void testCreateEnterpriseAccountWithInvalidEmailAddressByEnterpriseAdmin() {
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
         createAccountInputs.setEmailAddress("invalid_email_address@invalid.abc");
-        TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
+        createAccountByEnterpriseAdmin(webDriver, createAccountInputs, UserRole.EndUser);
 
         String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);

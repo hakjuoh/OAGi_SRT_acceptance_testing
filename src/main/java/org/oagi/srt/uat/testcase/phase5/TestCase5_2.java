@@ -24,7 +24,7 @@ import static org.oagi.srt.uat.testcase.phase5.TestCase5_Helper.createAccountByE
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase5_1 {
+public class TestCase5_2 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -52,11 +52,10 @@ public class TestCase5_1 {
     public void tearDown() {
         webDriver.close();
     }
-
+    
     @Test
-    public void testCreateEnterpriseAccountWithMinimumInformationByEnterpriseAdmin() {
+    public void testCreateEnterpriseAccountWithAllInformationByEnterpriseAdmin() {
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
-        createAccountInputs.setAddress(null);
         createAccountInputs.setEmailAddress("hakju.oh@gmail.com"); // to receive the verification email.
         createAccountByEnterpriseAdmin(webDriver, createAccountInputs, UserRole.EndUser);
 
