@@ -121,7 +121,12 @@ public class TestCaseHelper {
         List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
         WebElement expectedElement = null;
         for (WebElement element : elements) {
-            if (text.equals(element.getText())) {
+            String elementText = element.getText();
+            if (!StringUtils.isEmpty(elementText)) {
+                elementText = elementText.trim();
+            }
+
+            if (text.equals(elementText)) {
                 expectedElement = element;
                 break;
             }
@@ -257,6 +262,35 @@ public class TestCaseHelper {
         assertNotNull(createAccountElements.getUserTypeElement());
         assertNotNull(createAccountElements.getUserRoleElement());
         assertNotNull(createAccountElements.getEnterpriseNameElement());
+
+        assertNotNull(createAccountElements.getAddressElement());
+        assertNotNull(createAccountElements.getMobileNoElement());
+        assertNotNull(createAccountElements.getEmailAddressElement());
+
+        assertNotNull(createAccountElements.getPasswordElement());
+        assertNotNull(createAccountElements.getConfirmPasswordElement());
+
+        return createAccountElements;
+    }
+
+    public static CreateAccountElements createAccountElementsOnEnterpriseAdminPage(WebDriver webDriver) {
+        CreateAccountElements createAccountElements = new CreateAccountElements(webDriver);
+
+        createAccountElements.setLoginIdElement(findElementByContainingId(webDriver, "input[type=text]", "loginId"));
+        createAccountElements.setNameElement(findElementByContainingId(webDriver, "input[type=text]", "username"));
+        createAccountElements.setAddressElement(findElementByContainingId(webDriver, "input[type=text]", "address"));
+        createAccountElements.setMobileNoElement(findElementByContainingId(webDriver, "input[type=text]", "mobileNo"));
+        createAccountElements.setEmailAddressElement(findElementByContainingId(webDriver, "input[type=text]", "email"));
+
+        createAccountElements.setUserRoleElement(findElementByContainingId(webDriver, "select", "currentRole"));
+
+        createAccountElements.setPasswordElement(findElementByContainingId(webDriver, "input[type=password]", "user_password"));
+        createAccountElements.setConfirmPasswordElement(findElementByContainingId(webDriver, "input[type=password]", "user_confirm_password"));
+
+        assertNotNull(createAccountElements.getLoginIdElement());
+        assertNotNull(createAccountElements.getNameElement());
+
+        assertNotNull(createAccountElements.getUserRoleElement());
 
         assertNotNull(createAccountElements.getAddressElement());
         assertNotNull(createAccountElements.getMobileNoElement());

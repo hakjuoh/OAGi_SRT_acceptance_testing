@@ -34,7 +34,7 @@ public class TestCase2_1 {
 
         CreateAccountInputs createAccountInputs = CreateAccountInputs.generateRandomly(random);
         createAccountInputs.setAddress(null);
-        createAccountInputs.setEmailAddress("hno2@nist.gov"); // to receive the verification email.
+        createAccountInputs.setEmailAddress("hakju.oh@gmail.com"); // to receive the verification email.
         TestCase2_Helper.createFreeAccount(webDriver, createAccountInputs);
 
         logout(webDriver);

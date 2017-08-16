@@ -27,7 +27,6 @@ import java.util.Random;
 
 import static junit.framework.TestCase.*;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
-import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.createAdminDeveloper;
 import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.createDeveloper;
 import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.gotoManagePage;
 import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createEnterpriseAccount;
@@ -45,14 +44,11 @@ public class TestCase3_1 {
     @Autowired
     private Random random;
 
-    private CreateAccountInputs admin;
+    private CreateAccountInputs admin = CreateAccountInputs.OAGI_ADMIN;
 
     @Before
     public void setUp() {
-        this.admin = new CreateAccountInputs();
-        this.admin.setLoginId("oagis");
-        this.admin.setPassword("oagis");
-        //createAdminDeveloper(webDriver, random);
+        // this.admin = createAdminDeveloper(webDriver, random);
     }
 
     @After

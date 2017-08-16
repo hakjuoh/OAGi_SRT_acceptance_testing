@@ -5,6 +5,13 @@ import java.util.Random;
 
 public class CreateAccountInputs {
 
+    public static final CreateAccountInputs OAGI_ADMIN;
+    static {
+        OAGI_ADMIN = new CreateAccountInputs();
+        OAGI_ADMIN.setLoginId("oagis");
+        OAGI_ADMIN.setPassword("oagis");
+    }
+
     private String loginId;
     private String name;
     private String address;

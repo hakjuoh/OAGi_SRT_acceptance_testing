@@ -14,7 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.createDeveloper;
 
@@ -47,7 +46,8 @@ public class TestCase4_1 {
         gotoSubMenu(webDriver, "Admin", "Personal information");
 
         WebElement loginId = findElementByContainingId(webDriver, "input[type=text]", "loginId");
-        assertTrue(!loginId.isEnabled());
+        String readonlyAttr = loginId.getAttribute("readonly");
+        assertEquals("readonly", readonlyAttr);
     }
 
     @Test

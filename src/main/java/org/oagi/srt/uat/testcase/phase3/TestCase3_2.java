@@ -40,16 +40,13 @@ public class TestCase3_2 {
     @Autowired
     private Random random;
 
-    private CreateAccountInputs admin;
+    private CreateAccountInputs admin = CreateAccountInputs.OAGI_ADMIN;
 
     private CreateEnterpriseInputs enterprise;
 
     @Before
     public void setUp() {
-        this.admin = new CreateAccountInputs();
-        this.admin.setLoginId("oagis");
-        this.admin.setPassword("oagis");
-        //createAdminDeveloper(webDriver, random);
+        // admin = createAdminDeveloper(webDriver, random);
 
         enterprise = createEnterprise(webDriver, random, admin);
     }
