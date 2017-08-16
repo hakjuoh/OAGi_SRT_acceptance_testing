@@ -64,7 +64,7 @@ public class TestCase3_1 {
     public void testCreateEnterprise() {
         CreateEnterpriseInputs enterprise_1 = CreateEnterpriseInputs.generateRandomly(random);
         logger.info("Attempting to create enterprise using " + enterprise_1);
-        createEnterprise(webDriver, random, admin, enterprise_1);
+        createEnterprise(webDriver, admin, enterprise_1);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class TestCase3_1 {
         CreateEnterpriseInputs enterprise_2 = CreateEnterpriseInputs.generateRandomly(random);
         enterprise_2.setEmailAddress(null);
         logger.info("Attempting to create enterprise using " + enterprise_2);
-        createEnterprise(webDriver, random, admin, enterprise_2);
+        createEnterprise(webDriver, admin, enterprise_2);
 
         String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);
@@ -85,7 +85,7 @@ public class TestCase3_1 {
         CreateEnterpriseInputs enterprise_3 = CreateEnterpriseInputs.generateRandomly(random);
         enterprise_3.setEmailAddress("invalid-email-address");
         logger.info("Attempting to create enterprise using " + enterprise_3);
-        createEnterprise(webDriver, random, admin, enterprise_3);
+        createEnterprise(webDriver, admin, enterprise_3);
 
         String errorMessage = getErrorMessage(webDriver);
         logger.info("Error Message: " + errorMessage);
@@ -98,13 +98,13 @@ public class TestCase3_1 {
         CreateEnterpriseInputs enterprise = createEnterprise(webDriver, random, admin);
 
         gotoSubMenu(webDriver, "Admin", "Manage Enterprise");
-        gotoPageForEnterprise(enterprise.getEnterpriseName(), "Edit");
+        gotoPageForEnterprise(webDriver, enterprise.getEnterpriseName(), "Edit");
 
         CreateEnterpriseInputs updatesInfo = CreateEnterpriseInputs.generateRandomly(random);
         updateEnterprise(updatesInfo);
 
         gotoSubMenu(webDriver, "Admin", "Manage Enterprise");
-        gotoPageForEnterprise(updatesInfo.getEnterpriseName(), "View");
+        gotoPageForEnterprise(webDriver, updatesInfo.getEnterpriseName(), "View");
 
         WebElement enterpriseName = findElementByContainingId(webDriver, "input[type=text]", "enterpriseName");
         assertEquals(updatesInfo.getEnterpriseName(), enterpriseName.getAttribute("value"));
@@ -171,14 +171,21 @@ public class TestCase3_1 {
         gotoSubMenu(webDriver, "Admin", "Manage Enterprise");
     }
 
-    private void gotoPageForEnterprise(String enterpriseName, String pageName) {
+    static void gotoPageForEnterprise(WebDriver webDriver, String enterpriseName, String pageName) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
 
+        int lastDataRi = -1;
+        WebElement nextButton = null;
         while (true) {
             try {
                 List<WebElement> tableRows = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("tbody > tr.ui-widget-content[role='row']")));
+                int currentDataRi = -1;
                 for (WebElement tableRow : tableRows) {
-                    String dataRi = tableRow.getAttribute("data-ri");
+                    int dataRi = Integer.parseInt(tableRow.getAttribute("data-ri"));
+                    if (dataRi < lastDataRi) {
+                        break;
+                    }
+
                     List<WebElement> tableData = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("tbody > tr.ui-widget-content[data-ri='" + dataRi + "'] > td")));
                     boolean found = false;
                     for (WebElement tableDatum : tableData) {
@@ -197,15 +204,18 @@ public class TestCase3_1 {
                             }
                         }
                     }
+
+                    currentDataRi = lastDataRi = dataRi;
                 }
 
-                WebElement nextButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.ui-paginator > a:not(.ui-state-disabled)[aria-label='Next Page']")));
-                if (nextButton != null) {
-                    nextButton.click();
-                } else {
-                    break;
+                if (currentDataRi == lastDataRi) {
+                    nextButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.ui-paginator > a:not(.ui-state-disabled)[aria-label='Next Page']")));
+                    if (nextButton != null) {
+                        nextButton.click();
+                    } else {
+                        break;
+                    }
                 }
-
             } catch (StaleElementReferenceException e) {
                 continue;
             }

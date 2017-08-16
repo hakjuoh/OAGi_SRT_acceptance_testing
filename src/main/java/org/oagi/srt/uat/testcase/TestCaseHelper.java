@@ -25,10 +25,18 @@ public class TestCaseHelper {
     }
 
     public static void login(WebDriver webDriver, CreateAccountInputs createAccountInputs) {
-        login(webDriver, createAccountInputs.getLoginId(), createAccountInputs.getPassword());
+        login(webDriver, createAccountInputs, false);
+    }
+
+    public static void login(WebDriver webDriver, CreateAccountInputs createAccountInputs, boolean ensure) {
+        login(webDriver, createAccountInputs.getLoginId(), createAccountInputs.getPassword(), ensure);
     }
 
     public static void login(WebDriver webDriver, String username, String password) {
+        login(webDriver, username, password, false);
+    }
+
+    public static void login(WebDriver webDriver, String username, String password, boolean ensure) {
         index(webDriver);
 
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
@@ -42,10 +50,12 @@ public class TestCaseHelper {
 
         signinBtnElement.submit();
 
-        WebElement profileMenuElement = webDriver.findElement(By.cssSelector("ul.navbar-right > li > a.dropdown-toggle"));
-        String text = profileMenuElement.getText();
+        if (ensure) {
+            WebElement profileMenuElement = webDriver.findElement(By.cssSelector("ul.navbar-right > li > a.dropdown-toggle"));
+            String text = profileMenuElement.getText();
 
-        assertEquals(username, text);
+            assertEquals(username, text);
+        }
     }
 
     public static void logout(WebDriver webDriver) {
@@ -68,8 +78,9 @@ public class TestCaseHelper {
             try {
                 WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", menuName);
                 menu.click();
-                break;
+                return;
             } catch (StaleElementReferenceException ignore) {
+                continue;
             }
         }
 
@@ -84,8 +95,9 @@ public class TestCaseHelper {
             try {
                 WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", submenuName);
                 submenu.click();
-                break;
+                return;
             } catch (StaleElementReferenceException ignore) {
+                continue;
             }
         }
 

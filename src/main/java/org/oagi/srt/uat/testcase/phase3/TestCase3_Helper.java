@@ -21,12 +21,12 @@ public class TestCase3_Helper {
         CreateEnterpriseInputs createEnterpriseInputs = CreateEnterpriseInputs.generateRandomly(random);
         logger.info("Attempting to create enterprise using " + createEnterpriseInputs);
 
-        createEnterprise(webDriver, random, adminDeveloper, createEnterpriseInputs);
+        createEnterprise(webDriver, adminDeveloper, createEnterpriseInputs);
 
         return createEnterpriseInputs;
     }
 
-    public static void createEnterprise(WebDriver webDriver, Random random, CreateAccountInputs adminDeveloper, CreateEnterpriseInputs createEnterpriseInputs) {
+    public static void createEnterprise(WebDriver webDriver, CreateAccountInputs adminDeveloper, CreateEnterpriseInputs createEnterpriseInputs) {
         login(webDriver, adminDeveloper);
         gotoSubMenu(webDriver, "Admin", "Manage Enterprise");
         WebElement createEnterpriseBtn = findElementByText(webDriver, "button", "Create an enterprise");
