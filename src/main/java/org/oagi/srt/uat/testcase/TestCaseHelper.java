@@ -76,9 +76,13 @@ public class TestCaseHelper {
         long s = System.currentTimeMillis();
         while (!isTimeout(s, 2L, TimeUnit.SECONDS)) {
             try {
-                WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", menuName);
-                menu.click();
-                return;
+                WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", menuName, true);
+                if (menu != null) {
+                    menu.click();
+                    return;
+                } else {
+                    break;
+                }
             } catch (StaleElementReferenceException ignore) {
                 continue;
             }
@@ -93,9 +97,13 @@ public class TestCaseHelper {
         long s = System.currentTimeMillis();
         while (!isTimeout(s, 2L, TimeUnit.SECONDS)) {
             try {
-                WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", submenuName);
-                submenu.click();
-                return;
+                WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", submenuName, true);
+                if (submenu != null) {
+                    submenu.click();
+                    return;
+                } else {
+                    break;
+                }
             } catch (StaleElementReferenceException ignore) {
                 continue;
             }

@@ -78,7 +78,11 @@ public class CreateAccountInputs {
         createAccountInputs.setName("TestUser " + suffix);
         createAccountInputs.setAddress("100 Bureau Dr., #" + String.format("%4d", random.nextInt(10000)) + ", Gaithersburg, MD 20899");
 
-        createAccountInputs.setMobileNo(String.format("%03d-%03d-%04d", random.nextInt(1000), random.nextInt(1000), random.nextInt(10000)));
+        int phonePrefix = 0;
+        while (phonePrefix < 100) {
+            phonePrefix = random.nextInt(1000);
+        }
+        createAccountInputs.setMobileNo(String.format("%03d-%03d-%04d", phonePrefix, random.nextInt(1000), random.nextInt(10000)));
         // Note: Does not support the mobile number formatting.
         createAccountInputs.setMobileNo(createAccountInputs.getMobileNo().replaceAll("-", ""));
 

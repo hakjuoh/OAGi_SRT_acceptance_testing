@@ -1,4 +1,4 @@
-package org.oagi.srt.uat.testsuite;
+package org.oagi.srt.uat.testcase.phase1;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

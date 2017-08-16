@@ -94,7 +94,11 @@ public class CreateEnterpriseInputs {
         createEnterpriseInputs.setLastName("TestEnterprise " + suffix);
         createEnterpriseInputs.setAddress("100 Bureau Dr., #" + String.format("%4d", random.nextInt(10000)) + ", Gaithersburg, MD 20899");
 
-        createEnterpriseInputs.setPhone(String.format("%03d-%03d-%04d", random.nextInt(1000), random.nextInt(1000), random.nextInt(10000)));
+        int phonePrefix = 0;
+        while (phonePrefix < 100) {
+            phonePrefix = random.nextInt(1000);
+        }
+        createEnterpriseInputs.setPhone(String.format("%03d-%03d-%04d", phonePrefix, random.nextInt(1000), random.nextInt(10000)));
         // Note: Does not support the mobile number formatting.
         createEnterpriseInputs.setPhone(createEnterpriseInputs.getPhone().replaceAll("-", ""));
 
