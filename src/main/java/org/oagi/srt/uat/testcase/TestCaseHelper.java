@@ -326,6 +326,14 @@ public class TestCaseHelper {
         return enterpriseElements;
     }
 
+    public static String getDetailMessage(WebDriver webDriver) {
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        WebElement detailMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-info-detail")));
+        assertNotNull(detailMessageElement);
+
+        return detailMessageElement.getText();
+    }
+
     public static String getErrorMessage(WebDriver webDriver) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
         WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-error-detail")));

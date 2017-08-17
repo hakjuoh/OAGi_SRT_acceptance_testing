@@ -14,7 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.createDeveloper;
 
@@ -62,8 +61,11 @@ public class TestCase4_3 {
         WebElement updatePasswordButton = findElementByText(webDriver, "button[type=submit]", "Update Password");
         updatePasswordButton.click();
 
+        String detailMessage = getDetailMessage(webDriver);
+        assertEquals(detailMessage, "Password changed successfully.");
+
         logout(webDriver);
-        login(webDriver, developer.getLoginId(), updateAccountInfos.getPassword());
+        login(webDriver, developer.getLoginId(), updateAccountInfos.getPassword(), true);
     }
 
 

@@ -1,12 +1,10 @@
-package org.oagi.srt.uat.testcase.phase6;
+package org.oagi.srt.uat.testcase.phase17;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
-import org.oagi.srt.uat.testcase.CreateEnterpriseInputs;
-import org.oagi.srt.uat.testcase.UserRole;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -19,13 +17,11 @@ import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
-import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createEnterpriseAccount;
-import static org.oagi.srt.uat.testcase.phase3.TestCase3_Helper.createEnterprise;
-import static org.oagi.srt.uat.testcase.phase5.TestCase5_Helper.createAccountByEnterpriseAdmin;
+import static org.oagi.srt.uat.testcase.phase2.TestCase2_13.createAdminDeveloper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase6_5 {
+public class TestCase17_1 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -35,26 +31,12 @@ public class TestCase6_5 {
     @Autowired
     private Random random;
 
-    private CreateEnterpriseInputs enterprise;
-    private CreateAccountInputs enterpriseAdmin;
-    private CreateAccountInputs enterpriseEndUser;
+    private CreateAccountInputs admin;
 
     @Before
     public void setUp() {
-        enterprise = createEnterprise(webDriver, random, CreateAccountInputs.OAGI_ADMIN);
-
-        enterpriseAdmin = CreateAccountInputs.generateRandomly(random);
-        createEnterpriseAccount(webDriver, enterpriseAdmin, enterprise, UserRole.AdminUser);
-
-        logout(webDriver);
-        login(webDriver, enterpriseAdmin);
-
-        enterpriseEndUser = CreateAccountInputs.generateRandomly(random);
-        enterpriseEndUser.setAddress(null);
-        createAccountByEnterpriseAdmin(webDriver, enterpriseEndUser, UserRole.EndUser);
-
-        logout(webDriver);
-        login(webDriver, enterpriseEndUser);
+        admin = createAdminDeveloper(webDriver, random);
+        login(webDriver, admin);
     }
 
     @After
@@ -63,7 +45,7 @@ public class TestCase6_5 {
     }
 
     @Test
-    public void testEnterpriseEndUserCanChangePassword() {
+    public void testOAGIAdminDeveloperCanChangePassword() {
         gotoSubMenu(webDriver, "Admin", "Personal information");
 
         WebElement changePasswordButton = findElementByText(webDriver, "button[type=submit]", "Change a password");
@@ -71,7 +53,7 @@ public class TestCase6_5 {
 
         CreateAccountInputs updateAccountInfos = CreateAccountInputs.generateRandomly(random);
         WebElement oldPassword = findElementByContainingId(webDriver, "input[type=password]", "user_old_password");
-        sendKeys(oldPassword, enterpriseEndUser.getPassword());
+        sendKeys(oldPassword, admin.getPassword());
 
         WebElement newPassword = findElementByContainingId(webDriver, "input[type=password]", "user_new_password");
         sendKeys(newPassword, updateAccountInfos.getPassword());
@@ -86,7 +68,7 @@ public class TestCase6_5 {
         assertEquals(detailMessage, "Password changed successfully.");
 
         logout(webDriver);
-        login(webDriver, enterpriseEndUser.getLoginId(), updateAccountInfos.getPassword(), true);
+        login(webDriver, admin.getLoginId(), updateAccountInfos.getPassword(), true);
     }
 
 }
