@@ -74,7 +74,7 @@ public class TestCaseHelper {
         index(webDriver);
 
         long s = System.currentTimeMillis();
-        while (!isTimeout(s, 2L, TimeUnit.SECONDS)) {
+        while (!isTimeout(s, 5L, TimeUnit.SECONDS)) {
             try {
                 WebElement menu = findElementByText(webDriver, "ul.navbar-nav > li > a", menuName, true);
                 if (menu != null) {
@@ -95,7 +95,7 @@ public class TestCaseHelper {
         gotoMenu(webDriver, menuName);
 
         long s = System.currentTimeMillis();
-        while (!isTimeout(s, 2L, TimeUnit.SECONDS)) {
+        while (!isTimeout(s, 5L, TimeUnit.SECONDS)) {
             try {
                 WebElement submenu = findElementByText(webDriver, "ul.dropdown-menu > li > a", submenuName, true);
                 if (submenu != null) {
@@ -180,36 +180,37 @@ public class TestCaseHelper {
         String containsId = elementId.substring(elementId.indexOf(':') + 1, elementId.length());
 
         long s = System.currentTimeMillis();
-        while (!isTimeout(s, 2L, TimeUnit.SECONDS) || !isValueFilled(webDriver, elementId)) {
+        while (!isValueFilled(webDriver, elementId) && !isTimeout(s, 5L, TimeUnit.SECONDS)) {
             List<WebElement> dropdownElements = findDropdownElements(webDriver, containsId);
-            boolean clicked = false;
             for (WebElement dropdownElement : dropdownElements) {
                 String itemLabel = dropdownElement.getAttribute("data-item-label");
                 if (targetLabel.equals(itemLabel)) {
                     try {
                         dropdownElement.click();
-                        clicked = true;
+                        break;
                     } catch (ElementNotVisibleException ignore) {
                     }
                 }
-            }
-            if (!clicked) {
-                throw new IllegalArgumentException("Can't find given label: " + targetLabel);
             }
         }
 
         if (isValueFilled(webDriver, elementId)) {
             return;
         }
-        throw new IllegalStateException();
+        throw new IllegalArgumentException("Can't find given label: " + targetLabel);
     }
 
     private static boolean isValueFilled(WebDriver webDriver, String elementId) {
         return !StringUtils.isEmpty(getInputTextElement(webDriver, elementId).getAttribute("value"));
     }
 
-    private static boolean isTimeout(long startTime, long timeout, TimeUnit timeUnit) {
-        return (System.currentTimeMillis() - startTime) > timeUnit.convert(timeout, TimeUnit.MILLISECONDS);
+    public static boolean isTimeout(long startTime, long timeout, TimeUnit timeUnit) {
+        long e = System.currentTimeMillis() - startTime;
+        if (e <= 0L) {
+            return false;
+        }
+        boolean result = e > TimeUnit.MILLISECONDS.convert(timeout, timeUnit);
+        return result;
     }
 
     public static WebElement getInputTextElement(WebDriver webDriver, String id) {
