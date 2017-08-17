@@ -43,7 +43,7 @@ public class TestCase4_5 {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testOAGIDeveloperCannotChangePasswordUsingShortPassword() {
+    public void testOAGIDeveloperCannotManageRoles() {
         login(webDriver, developer);
         gotoSubMenu(webDriver, "Admin", "Manage Right for All Users");
     }
