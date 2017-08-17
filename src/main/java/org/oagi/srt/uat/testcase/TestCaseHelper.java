@@ -333,4 +333,12 @@ public class TestCaseHelper {
 
         return errorMessageElement.getText();
     }
+
+    public static String getErrorMessageOnLoginPage(WebDriver webDriver) {
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.alert-danger")));
+        assertNotNull(errorMessageElement);
+
+        return errorMessageElement.getText();
+    }
 }

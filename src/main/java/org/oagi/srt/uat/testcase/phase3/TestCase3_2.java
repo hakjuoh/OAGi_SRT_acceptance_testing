@@ -85,7 +85,7 @@ public class TestCase3_2 {
 
         testEnterpriseUserCannotLoginAfterEnterpriseIsDeactivated(accountInputs);
 
-        String errorMessage = getErrorMessageOnLoginPage();
+        String errorMessage = getErrorMessageOnLoginPage(webDriver);
         logger.info("Error Message: " + errorMessage);
 
         assertTrue(!StringUtils.isEmpty(errorMessage));
@@ -98,7 +98,7 @@ public class TestCase3_2 {
 
         testEnterpriseUserCannotLoginAfterEnterpriseIsDeactivated(accountInputs);
 
-        String errorMessage = getErrorMessageOnLoginPage();
+        String errorMessage = getErrorMessageOnLoginPage(webDriver);
         logger.info("Error Message: " + errorMessage);
 
         assertTrue(!StringUtils.isEmpty(errorMessage));
@@ -116,14 +116,6 @@ public class TestCase3_2 {
 
         logout(webDriver);
         login(webDriver, enterpriseUser);
-    }
-
-    private String getErrorMessageOnLoginPage() {
-        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.alert-danger")));
-        assertNotNull(errorMessageElement);
-
-        return errorMessageElement.getText();
     }
 
     @Test
