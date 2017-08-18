@@ -1,4 +1,4 @@
-package org.oagi.srt.uat.testcase.phase13;
+package org.oagi.srt.uat.testcase.phase14;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,11 +24,10 @@ import static org.oagi.srt.uat.testcase.TestCaseHelper.logout;
 import static org.oagi.srt.uat.testcase.phase13.TestCase13_Helper.*;
 import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createEnterpriseAccount;
 import static org.oagi.srt.uat.testcase.phase3.TestCase3_Helper.createEnterprise;
-import static org.oagi.srt.uat.testcase.phase5.TestCase5_Helper.createAccountByEnterpriseAdmin;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase13_1_10 {
+public class TestCase14_2 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -40,7 +39,6 @@ public class TestCase13_1_10 {
 
     private CreateEnterpriseInputs enterprise;
     private CreateAccountInputs enterpriseAdmin;
-    private CreateAccountInputs enterpriseEndUser;
 
     @Before
     public void setUp() {
@@ -51,13 +49,6 @@ public class TestCase13_1_10 {
 
         logout(webDriver);
         login(webDriver, enterpriseAdmin);
-
-        enterpriseEndUser = CreateAccountInputs.generateRandomly(random);
-        enterpriseEndUser.setAddress(null);
-        createAccountByEnterpriseAdmin(webDriver, enterpriseEndUser, UserRole.EndUser);
-
-        logout(webDriver);
-        login(webDriver, enterpriseEndUser);
     }
 
     @After
@@ -66,7 +57,7 @@ public class TestCase13_1_10 {
     }
 
     @Test(expected = TimeoutException.class)
-    public void testEndUserCanEditContextCategory() {
+    public void testAdminUserCanEditContextCategory() {
         String ctxCatName = createContextCategory(webDriver, random);
         String updateCtxCatName = editContextCategory(webDriver, random, ctxCatName);
 
