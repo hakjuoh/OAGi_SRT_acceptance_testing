@@ -118,17 +118,23 @@ public class TestCaseHelper {
 
     public static WebElement findElementByText(WebDriver webDriver, String cssSelector, String text, boolean nullReturn) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-        List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
+        long s = System.currentTimeMillis();
         WebElement expectedElement = null;
-        for (WebElement element : elements) {
-            String elementText = element.getText();
-            if (!StringUtils.isEmpty(elementText)) {
-                elementText = elementText.trim();
-            }
+        while (expectedElement == null && !isTimeout(s, 5L, TimeUnit.SECONDS)) {
+            try {
+                List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
+                for (WebElement element : elements) {
+                    String elementText = element.getText();
+                    if (!StringUtils.isEmpty(elementText)) {
+                        elementText = elementText.trim();
+                    }
 
-            if (text.equals(elementText)) {
-                expectedElement = element;
-                break;
+                    if (elementText.contains(text)) {
+                        expectedElement = element;
+                        break;
+                    }
+                }
+            } catch (StaleElementReferenceException e) {
             }
         }
 
@@ -144,13 +150,19 @@ public class TestCaseHelper {
 
     public static WebElement findElementByContainingId(WebDriver webDriver, String cssSelector, String containingId, boolean nullReturn) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-        List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
+        long s = System.currentTimeMillis();
         WebElement expectedElement = null;
-        for (WebElement webElement : elements) {
-            String id = webElement.getAttribute("id");
-            if (id.contains(containingId)) {
-                expectedElement = webElement;
-                break;
+        while (expectedElement == null && !isTimeout(s, 5L, TimeUnit.SECONDS)) {
+            try {
+                List<WebElement> elements = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssSelector)));
+                for (WebElement webElement : elements) {
+                    String id = webElement.getAttribute("id");
+                    if (id.contains(containingId)) {
+                        expectedElement = webElement;
+                        break;
+                    }
+                }
+            } catch (StaleElementReferenceException e) {
             }
         }
 
