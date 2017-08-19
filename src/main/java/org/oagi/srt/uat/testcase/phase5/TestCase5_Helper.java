@@ -18,7 +18,7 @@ public class TestCase5_Helper {
     private static Logger logger = LoggerFactory.getLogger(TestCase2_Helper.class);
 
     public static CreateAccountInputs createAccountByEnterpriseAdmin(WebDriver webDriver, CreateAccountInputs createAccountInputs, UserRole userRole) {
-        logger.info("Attempting to create account using " + createAccountInputs);
+        logger.info("Attempting to create enterprise account using " + createAccountInputs);
 
         gotoSubMenu(webDriver, "Admin", "Manage Tenant’s Users");
 

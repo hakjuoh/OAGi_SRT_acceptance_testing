@@ -2,12 +2,15 @@ package org.oagi.srt.uat.testcase.phase2;
 
 import org.oagi.srt.uat.testcase.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
+import static junit.framework.TestCase.assertNotNull;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 
 public class TestCase2_Helper {
@@ -44,6 +47,8 @@ public class TestCase2_Helper {
 
         WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
         createAccountBtnElement.click();
+
+        assertCreateAccount(webDriver, createAccountInputs.getLoginId());
     }
 
     public static void createEnterpriseAccount(WebDriver webDriver, CreateAccountInputs createAccountInputs, CreateEnterpriseInputs createEnterpriseInputs, UserRole userRole) {
@@ -73,5 +78,29 @@ public class TestCase2_Helper {
 
         WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
         createAccountBtnElement.click();
+
+        assertCreateAccount(webDriver, createAccountInputs.getLoginId());
+    }
+
+    public static void assertCreateAccount(WebDriver webDriver, String loginId) {
+        gotoSubMenu(webDriver, "Admin", "Manage Right for All Users");
+
+        WebElement searchInputText = findElementByContainingId(webDriver, "span.ui-autocomplete > input[type=text]", "loginId");
+        searchInputText.sendKeys(loginId);
+        findElementByText(webDriver, "span.ui-autocomplete-query", loginId).click();
+
+        WebElement searchButton = findElementByText(webDriver, "button[type=submit]", "Search");
+        searchButton.click();
+
+        long s = System.currentTimeMillis();
+        while (!isTimeout(s, 2L, TimeUnit.SECONDS)) {
+            try {
+                webDriver.findElement(By.cssSelector("tbody > tr[data-ri='1'] > td"));
+            } catch (NoSuchElementException e) {
+                break;
+            }
+        }
+
+        assertNotNull(findElementByText(webDriver, "tbody > tr[data-ri='0'] > td > a", loginId));
     }
 }

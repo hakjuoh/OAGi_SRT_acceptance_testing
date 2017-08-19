@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
 import org.oagi.srt.uat.testcase.CreateEnterpriseInputs;
 import org.oagi.srt.uat.testcase.UserRole;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.login;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.logout;
 import static org.oagi.srt.uat.testcase.phase13.TestCase13_Helper.*;
@@ -27,7 +25,7 @@ import static org.oagi.srt.uat.testcase.phase3.TestCase3_Helper.createEnterprise
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase14_2 {
+public class TestCase14_1_9 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -38,17 +36,10 @@ public class TestCase14_2 {
     private Random random;
 
     private CreateEnterpriseInputs enterprise;
-    private CreateAccountInputs enterpriseAdmin;
 
     @Before
     public void setUp() {
         enterprise = createEnterprise(webDriver, random, CreateAccountInputs.OAGI_ADMIN);
-
-        enterpriseAdmin = CreateAccountInputs.generateRandomly(random);
-        createEnterpriseAccount(webDriver, enterpriseAdmin, enterprise, UserRole.AdminUser);
-
-        logout(webDriver);
-        login(webDriver, enterpriseAdmin);
     }
 
     @After
@@ -56,13 +47,24 @@ public class TestCase14_2 {
         webDriver.close();
     }
 
-    @Test(expected = TimeoutException.class)
-    public void testAdminUserCanEditContextCategory() {
-        String ctxCatName = createContextCategory(webDriver, random);
-        String updateCtxCatName = editContextCategory(webDriver, random, ctxCatName);
+    @Test
+    public void testAdminUserCanEditContextCategoryCreatedByAnotherAdminUser() {
+        CreateAccountInputs enterpriseAdmin_1 = CreateAccountInputs.generateRandomly(random);
+        createEnterpriseAccount(webDriver, enterpriseAdmin_1, enterprise, UserRole.AdminUser);
 
+        CreateAccountInputs enterpriseAdmin_2 = CreateAccountInputs.generateRandomly(random);
+        createEnterpriseAccount(webDriver, enterpriseAdmin_2, enterprise, UserRole.AdminUser);
+
+        logout(webDriver);
+        login(webDriver, enterpriseAdmin_1);
+        String ctxCatName = createContextCategory(webDriver, random);
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName));
+
+        logout(webDriver);
+        login(webDriver, enterpriseAdmin_2);
+
+        String updateCtxCatName = editContextCategory(webDriver, random, ctxCatName);
         assertNotNull(searchContextCategoryByName(webDriver, updateCtxCatName));
-        assertNull(searchContextCategoryByName(webDriver, ctxCatName));
     }
 
 }

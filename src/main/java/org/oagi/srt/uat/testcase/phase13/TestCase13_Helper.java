@@ -27,7 +27,7 @@ public class TestCase13_Helper {
         return ctxCatName;
     }
 
-    public static String createContextCategory(WebDriver webDriver, String ctxCatName, String description) {
+    public static WebElement createContextCategory(WebDriver webDriver, String ctxCatName, String description) {
         gotoSubMenu(webDriver, "Context Management", "Context Category");
 
         WebElement createButton = findElementByText(webDriver, "button[type=button]", "Create Context Category");
@@ -42,7 +42,7 @@ public class TestCase13_Helper {
         WebElement create = webDriver.findElement(By.cssSelector("input[type=submit]"));
         create.click();
 
-        return ctxCatName;
+        return searchContextCategoryByName(webDriver, ctxCatName);
     }
 
     public static WebElement searchContextCategoryByName(WebDriver webDriver, String ctxCatName) {

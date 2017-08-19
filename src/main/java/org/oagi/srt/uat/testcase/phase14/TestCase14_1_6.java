@@ -1,4 +1,4 @@
-package org.oagi.srt.uat.testcase.phase13;
+package org.oagi.srt.uat.testcase.phase14;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,8 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Random;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.*;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 import static org.oagi.srt.uat.testcase.phase13.TestCase13_Helper.createContextCategory;
 import static org.oagi.srt.uat.testcase.phase13.TestCase13_Helper.searchContextCategoryByName;
@@ -29,7 +28,7 @@ import static org.oagi.srt.uat.testcase.phase5.TestCase5_Helper.createAccountByE
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase13_1_11 {
+public class TestCase14_1_6 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -40,18 +39,21 @@ public class TestCase13_1_11 {
     private Random random;
 
     private CreateEnterpriseInputs enterprise;
-    private CreateAccountInputs enterpriseAdmin;
+    private CreateAccountInputs enterpriseAdmin_1, enterpriseAdmin_2;
     private CreateAccountInputs enterpriseEndUser;
 
     @Before
     public void setUp() {
         enterprise = createEnterprise(webDriver, random, CreateAccountInputs.OAGI_ADMIN);
 
-        enterpriseAdmin = CreateAccountInputs.generateRandomly(random);
-        createEnterpriseAccount(webDriver, enterpriseAdmin, enterprise, UserRole.AdminUser);
+        enterpriseAdmin_1 = CreateAccountInputs.generateRandomly(random);
+        createEnterpriseAccount(webDriver, enterpriseAdmin_1, enterprise, UserRole.AdminUser);
+
+        enterpriseAdmin_2 = CreateAccountInputs.generateRandomly(random);
+        createEnterpriseAccount(webDriver, enterpriseAdmin_2, enterprise, UserRole.AdminUser);
 
         logout(webDriver);
-        login(webDriver, enterpriseAdmin);
+        login(webDriver, enterpriseAdmin_1);
 
         enterpriseEndUser = CreateAccountInputs.generateRandomly(random);
         enterpriseEndUser.setAddress(null);
@@ -66,26 +68,29 @@ public class TestCase13_1_11 {
     }
 
     @Test
-    public void testAdminUserCanShareCreatedContextCategoryByEndUser() {
-        login(webDriver, enterpriseEndUser);
+    public void testAdminUserCanSeeAllContextCategories() {
+        login(webDriver, enterpriseAdmin_1);
+        String ctxCatName_1 = createContextCategory(webDriver, random);
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName_1));
 
-        String ctxCatName = createContextCategory(webDriver, random);
+        String ctxCatName_2 = createContextCategory(webDriver, random);
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName_2));
 
         logout(webDriver);
-        login(webDriver, enterpriseAdmin);
+        login(webDriver, enterpriseEndUser);
+        String ctxCatName_3 = createContextCategory(webDriver, random);
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName_3));
 
-        WebElement row = searchContextCategoryByName(webDriver, ctxCatName);
-        WebElement parent = row.findElement(By.xpath("./../.."));
-        String dataRi = parent.getAttribute("data-ri");
+        String ctxCatName_4 = createContextCategory(webDriver, random);
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName_4));
 
-        WebElement shareButton = findElementByText(webDriver, "tr[data-ri='" + dataRi + "'] > td > button[type=submit]", "Share");
-        assertNotNull(shareButton);
-        shareButton.click();
+        logout(webDriver);
+        login(webDriver, enterpriseAdmin_2);
 
-        // ensure that the context category has been shared
-        searchContextCategoryByName(webDriver, ctxCatName);
-        shareButton = findElementByText(webDriver, "tr[data-ri='" + dataRi + "'] > td > button[type=submit]", "Share", true);
-        assertNull(shareButton);
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName_1));
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName_2));
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName_3));
+        assertNotNull(searchContextCategoryByName(webDriver, ctxCatName_4));
     }
 
 }

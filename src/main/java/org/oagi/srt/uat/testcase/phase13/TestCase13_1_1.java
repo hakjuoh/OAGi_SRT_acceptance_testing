@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Random;
 
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 import static org.oagi.srt.uat.testcase.phase13.TestCase13_Helper.createContextCategory;
 import static org.oagi.srt.uat.testcase.phase13.TestCase13_Helper.searchContextCategoryByName;
@@ -74,6 +75,11 @@ public class TestCase13_1_1 {
         WebElement shareButton = findElementByText(webDriver, "tr[data-ri='" + dataRi + "'] > td > button[type=submit]", "Share");
         assertNotNull(shareButton);
         shareButton.click();
+
+        // ensure that the context category has been shared
+        searchContextCategoryByName(webDriver, ctxCatName);
+        shareButton = findElementByText(webDriver, "tr[data-ri='" + dataRi + "'] > td > button[type=submit]", "Share", true);
+        assertNull(shareButton);
     }
 
 }
