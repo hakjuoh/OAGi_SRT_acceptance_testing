@@ -14,7 +14,7 @@ import static junit.framework.TestCase.assertNotNull;
 
 public class TestCaseHelper {
 
-    private static final String BASE_TARGET_URL = "http://uatsftp.justransform.com/";
+    private static final String BASE_TARGET_URL = "http://docker:8080/";
 
     public static void index(WebDriver webDriver) {
         webDriver.get(BASE_TARGET_URL);
