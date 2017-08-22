@@ -2,12 +2,11 @@ package org.oagi.srt.uat.testcase.phase13;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.uat.testcase.CreateContextSchemeInputs;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +15,8 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
 
 public class TestCase13_Helper {
+
+    private static Logger logger = LoggerFactory.getLogger(TestCase13_Helper.class);
 
     public static String createContextCategory(WebDriver webDriver, Random random) {
         int randomNo = random.nextInt(10000000);
@@ -114,6 +115,8 @@ public class TestCase13_Helper {
     }
 
     public static void createContextScheme(WebDriver webDriver, CreateContextSchemeInputs contextSchemeInputs) {
+        logger.info("Attempting to create context scheme using " + contextSchemeInputs);
+
         gotoSubMenu(webDriver, "Context Management", "Context Scheme");
         WebElement createButton = findElementByText(webDriver, "button[type=button]", "Create Context Scheme");
         createButton.click();
@@ -231,8 +234,15 @@ public class TestCase13_Helper {
     public static void editContextScheme(WebDriver webDriver, String searchName, CreateContextSchemeInputs contextSchemeInputs) {
         gotoSubMenu(webDriver, "Context Management", "Context Scheme");
 
-        WebElement link = searchContextSchemeByName(webDriver, searchName);
-        link.click();
+        while (true) {
+            try {
+                WebElement link = searchContextSchemeByName(webDriver, searchName);
+                link.click();
+                break;
+            } catch (StaleElementReferenceException e) {
+            }
+        }
+
 
         WebElement nameElement = findElementByContainingId(webDriver, "input[type=text]", "name");
         nameElement.clear();

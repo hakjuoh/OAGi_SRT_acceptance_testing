@@ -43,6 +43,7 @@ public class TestCase5_Helper {
 
         WebElement createAccountBtnElement = webDriver.findElement(By.cssSelector("button[type=submit]"));
         createAccountBtnElement.click();
+        createAccountBtnElement.submit();
 
         return createAccountInputs;
     }
