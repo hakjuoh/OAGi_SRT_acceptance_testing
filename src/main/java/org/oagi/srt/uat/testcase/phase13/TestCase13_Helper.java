@@ -27,7 +27,7 @@ public class TestCase13_Helper {
         return ctxCatName;
     }
 
-    public static WebElement createContextCategory(WebDriver webDriver, String ctxCatName, String description) {
+    public static String createContextCategory(WebDriver webDriver, String ctxCatName, String description) {
         gotoSubMenu(webDriver, "Context Management", "Context Category");
 
         WebElement createButton = findElementByText(webDriver, "button[type=button]", "Create Context Category");
@@ -42,7 +42,7 @@ public class TestCase13_Helper {
         WebElement create = webDriver.findElement(By.cssSelector("input[type=submit]"));
         create.click();
 
-        return searchContextCategoryByName(webDriver, ctxCatName);
+        return ctxCatName;
     }
 
     public static WebElement searchContextCategoryByName(WebDriver webDriver, String ctxCatName) {
@@ -107,21 +107,7 @@ public class TestCase13_Helper {
     }
 
     public static CreateContextSchemeInputs createContextScheme(WebDriver webDriver, Random random, String ctxCatName) {
-        CreateContextSchemeInputs contextSchemeInputs = new CreateContextSchemeInputs();
-        contextSchemeInputs.setContextCategory(ctxCatName);
-
-        int randomNo = random.nextInt(10000000);
-        String suffix = String.format("%08d", randomNo);
-
-        contextSchemeInputs.setName("test_ctx_sch_name_" + suffix);
-        contextSchemeInputs.setSchemeId("test_ctx_sch_schemeId_" + suffix);
-        contextSchemeInputs.setAgencyId("test_ctx_agencyId_" + suffix);
-        contextSchemeInputs.setVersion("test_ctx_version_" + suffix);
-        contextSchemeInputs.setDescription("test_ctx_sch_description_" + suffix);
-
-        contextSchemeInputs.setValue("test_ctx_sch_value_" + suffix);
-        contextSchemeInputs.setMeaning("test_ctx_sch_meaning_" + suffix);
-
+        CreateContextSchemeInputs contextSchemeInputs = CreateContextSchemeInputs.generateRandomly(random, ctxCatName);
         createContextScheme(webDriver, contextSchemeInputs);
 
         return contextSchemeInputs;
@@ -232,10 +218,20 @@ public class TestCase13_Helper {
         return findElementByText(webDriver, "tbody > tr[data-ri='0'] > td", ctxSchName);
     }
 
+    public static CreateContextSchemeInputs editContextScheme(WebDriver webDriver, Random random, CreateContextSchemeInputs contextSchemeInputs) {
+        CreateContextSchemeInputs updatedContextSchemeInputs = CreateContextSchemeInputs.generateRandomly(random, contextSchemeInputs.getContextCategory());
+        editContextScheme(webDriver, contextSchemeInputs.getName(), updatedContextSchemeInputs);
+        return updatedContextSchemeInputs;
+    }
+
     public static void editContextScheme(WebDriver webDriver, CreateContextSchemeInputs contextSchemeInputs) {
+        editContextScheme(webDriver, contextSchemeInputs.getName(), contextSchemeInputs);
+    }
+
+    public static void editContextScheme(WebDriver webDriver, String searchName, CreateContextSchemeInputs contextSchemeInputs) {
         gotoSubMenu(webDriver, "Context Management", "Context Scheme");
 
-        WebElement link = searchContextSchemeByName(webDriver, contextSchemeInputs.getName());
+        WebElement link = searchContextSchemeByName(webDriver, searchName);
         link.click();
 
         WebElement nameElement = findElementByContainingId(webDriver, "input[type=text]", "name");

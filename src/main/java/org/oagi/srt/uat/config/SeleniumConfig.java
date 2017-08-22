@@ -14,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class SeleniumConfig {
@@ -53,6 +54,10 @@ public class SeleniumConfig {
         System.setProperty(CHROME_DRIVER_PROPERTY_KEY, webDriverFilePath);
 
         ChromeDriver driver = new ChromeDriver();
+
+        WebDriver.Timeouts timeouts = driver.manage().timeouts();
+        timeouts.pageLoadTimeout(10L, TimeUnit.SECONDS);
+
         return driver;
     }
 }
