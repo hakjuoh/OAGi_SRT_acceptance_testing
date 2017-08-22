@@ -84,20 +84,6 @@ public class CreateContextSchemeInputs {
         this.meaning = meaning;
     }
 
-    @Override
-    public String toString() {
-        return "CreateContextSchemeInputs{" +
-                "contextCategory='" + contextCategory + '\'' +
-                ", name='" + name + '\'' +
-                ", schemeId='" + schemeId + '\'' +
-                ", agencyId='" + agencyId + '\'' +
-                ", version='" + version + '\'' +
-                ", description='" + description + '\'' +
-                ", value='" + value + '\'' +
-                ", meaning='" + meaning + '\'' +
-                '}';
-    }
-
     public static CreateContextSchemeInputs generateRandomly(Random random, String ctxCatName) {
         CreateContextSchemeInputs contextSchemeInputs = new CreateContextSchemeInputs();
         contextSchemeInputs.setContextCategory(ctxCatName);

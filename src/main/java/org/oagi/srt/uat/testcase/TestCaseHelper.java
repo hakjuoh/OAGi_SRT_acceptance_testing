@@ -138,6 +138,10 @@ public class TestCaseHelper {
             }
         }
 
+        if (isTimeout(s, 5L, TimeUnit.SECONDS)) {
+            throw new TimeoutException();
+        }
+
         if (!nullReturn) {
             assertNotNull(expectedElement);
         }
@@ -164,6 +168,10 @@ public class TestCaseHelper {
                 }
             } catch (StaleElementReferenceException e) {
             }
+        }
+
+        if (isTimeout(s, 5L, TimeUnit.SECONDS)) {
+            throw new TimeoutException();
         }
 
         if (!nullReturn) {
@@ -204,6 +212,10 @@ public class TestCaseHelper {
                     }
                 }
             }
+        }
+
+        if (isTimeout(s, 5L, TimeUnit.SECONDS)) {
+            throw new TimeoutException();
         }
 
         if (isValueFilled(webDriver, elementId)) {
@@ -341,7 +353,7 @@ public class TestCaseHelper {
 
     public static String getDetailMessage(WebDriver webDriver) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-        WebElement detailMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-info-detail")));
+        WebElement detailMessageElement = presenceOfElementLocated(webDriver, By.cssSelector("span.ui-messages-info-detail"));
         assertNotNull(detailMessageElement);
 
         return detailMessageElement.getText();
@@ -349,7 +361,7 @@ public class TestCaseHelper {
 
     public static String getErrorMessage(WebDriver webDriver) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("span.ui-messages-error-detail")));
+        WebElement errorMessageElement = presenceOfElementLocated(webDriver, By.cssSelector("span.ui-messages-error-detail"));
         assertNotNull(errorMessageElement);
 
         return errorMessageElement.getText();
@@ -357,9 +369,19 @@ public class TestCaseHelper {
 
     public static String getErrorMessageOnLoginPage(WebDriver webDriver) {
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-        WebElement errorMessageElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.alert-danger")));
+        WebElement errorMessageElement = presenceOfElementLocated(webDriver, By.cssSelector("div.alert-danger"));
         assertNotNull(errorMessageElement);
 
         return errorMessageElement.getText();
+    }
+
+    public static WebElement presenceOfElementLocated(WebDriver webDriver, By by) {
+        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+        while (true) {
+            try {
+                return wait.until(ExpectedConditions.presenceOfElementLocated(by));
+            } catch (StaleElementReferenceException e) {
+            }
+        }
     }
 }
