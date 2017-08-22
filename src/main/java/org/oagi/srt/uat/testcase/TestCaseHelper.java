@@ -62,6 +62,19 @@ public class TestCaseHelper {
         webDriver.get(BASE_TARGET_URL + "logout");
     }
 
+    public static void sendKeysInputText(WebDriver webDriver, String id, String key) {
+        while (true) {
+            try {
+                WebElement element = findElementByContainingId(webDriver, "input[type=text]", id);
+                assertNotNull(element);
+                element.clear();
+                sendKeys(element, key);
+                break;
+            } catch (StaleElementReferenceException e) {
+            }
+        }
+    }
+
     public static void sendKeys(WebElement webElement, String key) {
         if (StringUtils.isEmpty(key)) {
             return;
@@ -204,7 +217,7 @@ public class TestCaseHelper {
             List<WebElement> dropdownElements = findDropdownElements(webDriver, containsId);
             for (WebElement dropdownElement : dropdownElements) {
                 String itemLabel = dropdownElement.getAttribute("data-item-label");
-                if (targetLabel.equals(itemLabel)) {
+                if (itemLabel.contains(targetLabel)) {
                     try {
                         dropdownElement.click();
                         break;
@@ -225,7 +238,13 @@ public class TestCaseHelper {
     }
 
     private static boolean isValueFilled(WebDriver webDriver, String elementId) {
-        return !StringUtils.isEmpty(getInputTextElement(webDriver, elementId).getAttribute("value"));
+        while (true) {
+            try {
+                return !StringUtils.isEmpty(getInputTextElement(webDriver, elementId).getAttribute("value"));
+            } catch (StaleElementReferenceException e) {
+
+            }
+        }
     }
 
     public static boolean isTimeout(long startTime, long timeout, TimeUnit timeUnit) {

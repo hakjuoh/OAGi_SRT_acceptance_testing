@@ -145,24 +145,10 @@ public class TestCase13_Helper {
         String value = contextSchemeInputs.getValue();
         String meaning = contextSchemeInputs.getMeaning();
         if (!StringUtils.isEmpty(value) || !StringUtils.isEmpty(meaning)) {
-            WebElement addButton = findElementByText(webDriver, "button[type=submit]", "Add");
-            addButton.click();
+            click(findElementByText(webDriver, "button[type=submit]", "Add"));
 
-            WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-
-            if (!StringUtils.isEmpty(value)) {
-                WebElement valueElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='0'] > td input[data-p-label='Value']")));
-                valueElement.findElement(By.xpath("./../../..")).click();
-                valueElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='0'] > td input[data-p-label='Value'].ui-state-focus")));
-                sendKeys(valueElement, value);
-            }
-
-            if (!StringUtils.isEmpty(meaning)) {
-                WebElement meaningElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='0'] > td input[data-p-label='Meaning']")));
-                meaningElement.findElement(By.xpath("./../../..")).click();
-                meaningElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='0'] > td input[data-p-label='Meaning'].ui-state-focus")));
-                sendKeys(meaningElement, contextSchemeInputs.getMeaning());
-            }
+            fillEditableCell(webDriver, "Value", value, 0);
+            fillEditableCell(webDriver, "Meaning", meaning, 0);
 
             // WebElement deleteButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='0'] > td button[type=submit]")));
         }
@@ -264,21 +250,8 @@ public class TestCase13_Helper {
         click(searchContextSchemeByName(webDriver, contextSchemeInputs.getName()));
         click(findElementByText(webDriver, "button[type=submit]", "Add"));
 
-        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-
-        if (!StringUtils.isEmpty(value)) {
-            WebElement valueElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='Value']")));
-            click(valueElement.findElement(By.xpath("./../../..")));
-            valueElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='Value'].ui-state-focus")));
-            sendKeys(valueElement, value);
-        }
-
-        if (!StringUtils.isEmpty(meaning)) {
-            WebElement meaningElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='Meaning']")));
-            click(meaningElement.findElement(By.xpath("./../../..")));
-            meaningElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='Meaning'].ui-state-focus")));
-            sendKeys(meaningElement, meaning);
-        }
+        fillEditableCell(webDriver, "Value", value, dataRi);
+        fillEditableCell(webDriver, "Meaning", meaning, dataRi);
 
         WebElement update = click(findElementByText(webDriver, "button[type=submit]", "Update"));
         update.submit();
@@ -289,24 +262,23 @@ public class TestCase13_Helper {
 
         WebDriverWait wait = new WebDriverWait(webDriver, 5L);
 
-        if (!StringUtils.isEmpty(value)) {
-            WebElement valueElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='Value']")));
-            click(valueElement.findElement(By.xpath("./../../..")));
-            valueElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='Value'].ui-state-focus")));
-            valueElement.clear();
-            sendKeys(valueElement, value);
-        }
-
-        if (!StringUtils.isEmpty(meaning)) {
-            WebElement meaningElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='Meaning']")));
-            click(meaningElement.findElement(By.xpath("./../../..")));
-            meaningElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='Meaning'].ui-state-focus")));
-            meaningElement.clear();
-            sendKeys(meaningElement, meaning);
-        }
+        fillEditableCell(webDriver, "Value", value, dataRi);
+        fillEditableCell(webDriver, "Meaning", meaning, dataRi);
 
         WebElement update = click(findElementByText(webDriver, "button[type=submit]", "Update"));
         update.submit();
+    }
+
+    public static void fillEditableCell(WebDriver webDriver, String label, String value, int dataRi) {
+        if (!StringUtils.isEmpty(value)) {
+            WebDriverWait wait = new WebDriverWait(webDriver, 5L);
+
+            WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='" + label + "']")));
+            click(element.findElement(By.xpath("./../../..")));
+            element = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("tbody > tr[data-ri='" + dataRi + "'] > td input[data-p-label='" + label + "'].ui-state-focus")));
+            element.clear();
+            sendKeys(element, value);
+        }
     }
 
     public static WebElement click(WebElement webElement) {
