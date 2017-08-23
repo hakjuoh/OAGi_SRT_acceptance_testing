@@ -26,6 +26,8 @@ public class CreateCodeListInputs {
 
     private String codeListValueDefinitionSource;
 
+    private boolean publish;
+
     public String getName() {
         return name;
     }
@@ -114,6 +116,14 @@ public class CreateCodeListInputs {
         this.codeListValueDefinitionSource = codeListValueDefinitionSource;
     }
 
+    public boolean isPublish() {
+        return publish;
+    }
+
+    public void setPublish(boolean publish) {
+        this.publish = publish;
+    }
+
     @Override
     public String toString() {
         return "CreateCodeListInputs{" +
@@ -128,6 +138,7 @@ public class CreateCodeListInputs {
                 ", codeListValueShortName='" + codeListValueShortName + '\'' +
                 ", codeListValueDefinition='" + codeListValueDefinition + '\'' +
                 ", codeListValueDefinitionSource='" + codeListValueDefinitionSource + '\'' +
+                ", publish=" + publish +
                 '}';
     }
 

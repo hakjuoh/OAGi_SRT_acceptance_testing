@@ -55,6 +55,7 @@ public class SeleniumConfig {
 
         ChromeDriver driver = new ChromeDriver();
 
+        driver.manage().window().maximize();
         WebDriver.Timeouts timeouts = driver.manage().timeouts();
         timeouts.pageLoadTimeout(10L, TimeUnit.SECONDS);
 

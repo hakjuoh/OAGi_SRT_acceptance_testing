@@ -67,7 +67,6 @@ public class TestCaseHelper {
             try {
                 WebElement element = findElementByContainingId(webDriver, "input[type=text]", id);
                 assertNotNull(element);
-                element.clear();
                 sendKeys(element, key);
                 break;
             } catch (StaleElementReferenceException e) {
@@ -77,6 +76,7 @@ public class TestCaseHelper {
 
     public static void sendKeys(WebElement webElement, String key) {
         if (StringUtils.isEmpty(key)) {
+            webElement.clear();
             return;
         }
 
@@ -206,6 +206,12 @@ public class TestCaseHelper {
     }
 
     public static void clickDropdownElement(WebDriver webDriver, WebElement element, String targetLabel) {
+        if (StringUtils.isEmpty(targetLabel)) {
+            WebElement input = webDriver.findElement(By.cssSelector("span[id='" + element.getAttribute("id") + "'] > input[type=text]"));
+            input.clear();
+            return;
+        }
+
         WebElement dropdownButton = webDriver.findElement(By.cssSelector("span[id='" + element.getAttribute("id") + "'] > button.ui-autocomplete-dropdown"));
         dropdownButton.click();
 

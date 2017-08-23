@@ -2,7 +2,10 @@ package org.oagi.srt.uat.testcase.phase13;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oagi.srt.uat.testcase.CreateContextSchemeInputs;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -260,8 +263,6 @@ public class TestCase13_Helper {
     public static void editContextSchemeValue(WebDriver webDriver, CreateContextSchemeInputs contextSchemeInputs, String value, String meaning, int dataRi) {
         click(searchContextSchemeByName(webDriver, contextSchemeInputs.getName()));
 
-        WebDriverWait wait = new WebDriverWait(webDriver, 5L);
-
         fillEditableCell(webDriver, "Value", value, dataRi);
         fillEditableCell(webDriver, "Meaning", meaning, dataRi);
 
@@ -282,11 +283,7 @@ public class TestCase13_Helper {
     }
 
     public static WebElement click(WebElement webElement) {
-        while (true) {
-            try {
-                webElement.click();
-                return webElement;
-            } catch (StaleElementReferenceException e) {}
-        }
+        webElement.click();
+        return webElement;
     }
 }

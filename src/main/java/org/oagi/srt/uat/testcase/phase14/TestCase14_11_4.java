@@ -8,7 +8,6 @@ import org.oagi.srt.uat.CreateCodeListInputs;
 import org.oagi.srt.uat.testcase.CreateAccountInputs;
 import org.oagi.srt.uat.testcase.CreateEnterpriseInputs;
 import org.oagi.srt.uat.testcase.UserRole;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -19,18 +18,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Random;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
-import static org.oagi.srt.uat.testcase.TestCaseHelper.*;
+import static org.oagi.srt.uat.testcase.TestCaseHelper.login;
+import static org.oagi.srt.uat.testcase.TestCaseHelper.logout;
 import static org.oagi.srt.uat.testcase.phase13.TestCase13_Helper.click;
-import static org.oagi.srt.uat.testcase.phase14.TestCase14_Helper.*;
+import static org.oagi.srt.uat.testcase.phase14.TestCase14_Helper.createCodeListWithoutBase;
+import static org.oagi.srt.uat.testcase.phase14.TestCase14_Helper.searchCodeListByName;
 import static org.oagi.srt.uat.testcase.phase2.TestCase2_Helper.createEnterpriseAccount;
 import static org.oagi.srt.uat.testcase.phase3.TestCase3_Helper.createEnterprise;
 import static org.oagi.srt.uat.testcase.phase5.TestCase5_Helper.createAccountByEnterpriseAdmin;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestCase14_11_2 {
+public class TestCase14_11_4 {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -68,24 +68,14 @@ public class TestCase14_11_2 {
     }
 
     @Test
-    public void testCreateCodeListBasedOnSharedCodeList() {
+    public void testEditCodeListCreatedByEndUser() {
         CreateCodeListInputs codeListInputs = createCodeListWithoutBase(webDriver, random);
-        WebElement row = searchCodeListByName(webDriver, codeListInputs.getName());
-        share(webDriver, row);
-
-        searchCodeListByName(webDriver, codeListInputs.getName());
-    }
-
-    @Test
-    public void testCreateCodeListBasedOnPublishedCodeList() {
-        CreateCodeListInputs codeListInputs = CreateCodeListInputs.generateRandomly(random);
-        codeListInputs.setPublish(true);
-        createCodeListWithoutBase(webDriver, codeListInputs);
+        assertNotNull(searchCodeListByName(webDriver, codeListInputs.getName()));
 
         logout(webDriver);
         login(webDriver, enterpriseAdmin);
 
-        WebElement link = searchCodeListForCreateNewCodeListByName(webDriver, codeListInputs.getName());
+        WebElement link = searchCodeListByName(webDriver, codeListInputs.getName());
         click(link);
     }
 
